@@ -56,7 +56,8 @@ They can be members of `WeakSets` and keys of a `WeakMaps`.
 Tuples, being objects, can be made of other tuples:
 
 ```javascript
-console.log( Tuple(Tuple(1, 2, 3), Tuple(4, 5, 6)) === Tuple(Tuple(1, 2, 3), Tuple(4, 5, 6)) ); // true
+console.log( Tuple(Tuple(1, 2), Tuple(3, 4)) === Tuple(Tuple(1, 2), Tuple(3, 4)) );
+// true
 ```
 
 #### Frozen
