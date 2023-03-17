@@ -49,7 +49,7 @@ Tuple( a ) === Tuple( a ); // true :)
 
 #### Objects
 
-They can be members of `WeakSets` and keys of a `WeakMaps`.
+They can be members of `WeakSets` and keys of `WeakMaps`.
 
 #### Composable
 
