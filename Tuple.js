@@ -1,9 +1,10 @@
-const WeakMap = globalThis.WeakMap;
-const Map     = globalThis.Map;
-const refTree = new WeakMap;
-const terminator = Object.create(null);
-const baseTuple  = Object.create(null);
+const WeakMap      = globalThis.WeakMap;
+const Map          = globalThis.Map;
+const refTree      = new WeakMap;
+const terminator   = Object.create(null);
+const baseTuple    = Object.create(null);
 baseTuple.toString = () => '[Object Tuple]';
+
 Object.freeze(terminator);
 Object.freeze(baseTuple);
 
