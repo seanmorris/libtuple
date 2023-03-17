@@ -80,14 +80,14 @@ module.exports = function Tuple(...args)
 		}
 	}
 
+	if(!map.has(terminator))
+	{
+		map.set(terminator, {prefixMap: new Map, result: null});
+	}
+
 	if(!mode)
 	{
 		part = JSON.stringify(part.map(p => `${typeof p}::${p}`))
-
-		if(!map.has(terminator))
-		{
-			map.set(terminator, {prefixMap: new Map, result: null});
-		}
 
 		if(!map.get(terminator).prefixMap.has(part))
 		{
@@ -100,11 +100,6 @@ module.exports = function Tuple(...args)
 		}
 
 		return map.get(terminator).prefixMap.get(part);
-	}
-
-	if(!map.has(terminator))
-	{
-		map.set(terminator, {prefixMap: new Map, result: null});
 	}
 
 	if(!map.get(terminator).result)
