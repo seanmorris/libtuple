@@ -53,7 +53,7 @@ They can be members of `WeakSets` and keys of `WeakMaps`.
 
 #### Composable
 
-Tuples, being objects, can be made of other tuples:
+Tuples can be members of of other tuples. This works as expected:
 
 ```javascript
 console.log( Tuple(Tuple(1, 2), Tuple(3, 4)) === Tuple(Tuple(1, 2), Tuple(3, 4)) );
