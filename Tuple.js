@@ -42,13 +42,12 @@ module.exports = function Tuple(...args)
 		{
 			part.push(arg);
 		}
+		else if(canMap)
+		{
+			prefix = JSON.stringify(part.map(p => `${typeof p}::${p}`))
+		}
 		else
 		{
-			if(canMap)
-			{
-				prefix = JSON.stringify(part.map(p => `${typeof p}::${p}`))
-			}
-
 			part = [arg];
 		}
 
