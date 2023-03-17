@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "author": "Sean Morris",
   "description": "Memory-efficient tuple implementation.",
+  "repository": "https://github.com/seanmorris/libtuple.js",
   "main": "Tuple.js",
   "scripts": {
     "test": "node --test test.js"
