@@ -86,4 +86,4 @@ libtuple is a bog-standard CJS module with a single export and relatively mundan
 
 ## Testing
 
-Run `npm run test` in the terminal.
+Run `npm run test` or `node --test test.js` in the terminal.
