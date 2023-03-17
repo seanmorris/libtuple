@@ -47,10 +47,6 @@ Tuple( a ) === Tuple( a ); // true :)
 
 ### Tuples are...
 
-#### Objects
-
-They can be members of `WeakSets` and keys of `WeakMaps`.
-
 #### Composable
 
 Tuples can be members of of other tuples. This works as expected:
@@ -63,20 +59,6 @@ console.log( Tuple(Tuple(1, 2), Tuple(3, 4)) === Tuple(Tuple(1, 2), Tuple(3, 4))
 #### Frozen
 
 You cannot add, remove or modify any property on a tuple.
-
-#### Not Iterable
-
-You can't loop over a Tuple directly, but properties **are** accessible at index `[0]`, `[1]`, `[2]` and so on.
-
-Tuples also have a `.length` property, so the `Array` class can make use of them:
-
-```javascript
-
-const tuple = Tuple(1, 2, 3);
-
-Array.from(tuple).forEach(t => console.log(t));
-
-```
 
 ## How It Works
 
@@ -96,6 +78,7 @@ Organizing the hierarchy with the scalar prefixes *after* the objects allows us 
 
 * `Symbol`s cannot participate in `tuples`.
 * ~~The library cannot tell the difference between `null` and `undefined`~~.
+* Purely scalar-based tuples are represented by strings, not objects.
 
 ## Building
 

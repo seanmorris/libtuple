@@ -89,11 +89,14 @@ module.exports = function Tuple(...args)
 	{
 		part = JSON.stringify(part.map(p => `${typeof p}::${p}`))
 
+		if(!maps)
+		{
+			return part;
+		}
+
 		if(!map.get(terminator).prefixMap.has(part))
 		{
 			const result = Object.create(baseTuple);
-			result.length = args.length;
-			Object.assign(result, args);
 			Object.freeze(result);
 
 			map.get(terminator).prefixMap.set(part, result);
@@ -105,8 +108,6 @@ module.exports = function Tuple(...args)
 	if(!map.get(terminator).result)
 	{
 		const result  = Object.create(baseTuple);
-		result.length = args.length;
-		Object.assign(result, args);
 		Object.freeze(result);
 
 		map.get(terminator).result = result;
