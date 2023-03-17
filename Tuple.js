@@ -1,5 +1,3 @@
-const WeakMap      = globalThis.WeakMap;
-const Map          = globalThis.Map;
 const refTree      = new WeakMap;
 const terminator   = Object.create(null);
 const baseTuple    = Object.create(null);
@@ -12,7 +10,7 @@ module.exports = function Tuple(...args)
 {
 	if(new.target)
 	{
-		throw new globalThis.Error('"Tuple" is not a constructor. Create a Tuple by invoking the function directly.');
+		throw new Error('"Tuple" is not a constructor. Create a Tuple by invoking the function directly.');
 	}
 
 	if(!args.length)
@@ -35,7 +33,7 @@ module.exports = function Tuple(...args)
 
 		if(type === 'symbol')
 		{
-			throw new globalThis.Error('Symbols cannot participate in Tuples.');
+			throw new Error('Symbols cannot participate in Tuples.');
 		}
 
 		mode = mode ?? canMap;
