@@ -45,9 +45,30 @@ const a = [];
 Tuple( a ) === Tuple( a ); // true :)
 ```
 
-## Tuples are...
+### Tuples are...
 
-* **Objects**, they can be members of `WeakSets` and keys of a `WeakMaps`.
+#### Objects
+
+They can be members of `WeakSets` and keys of a `WeakMaps`.
+
+#### Frozen
+
+You cannot add, remove or modify property on a tuple.
+
+### Not Iterable
+
+You can't loop over a Tuple directly, but properties **are** accessible at index `[0]`, `[1]`, `[2]` and so on.
+
+Tuples also have a `.length` property, so the `Array` class can make use of them:
+
+
+```javascript
+
+const tuple = Tuple(1, 2, 3);
+
+Array.from(tuple).forEach(t => console.log(t));
+
+```
 
 ## How It Works
 
