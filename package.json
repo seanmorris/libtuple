@@ -1,0 +1,14 @@
+{
+  "name": "libtuple",
+  "version": "0.0.0",
+  "author": "Sean Morris",
+  "description": "Memory-efficient tuple implementation.",
+  "main": "Tuple.js",
+  "scripts": {
+    "test": "node --test test.js"
+  },
+  "license": "Apache 2.0",
+  "files": [
+    "Tuple.js"
+  ]
+}
