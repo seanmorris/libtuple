@@ -51,11 +51,19 @@ Tuple( a ) === Tuple( a ); // true :)
 
 They can be members of `WeakSets` and keys of a `WeakMaps`.
 
+#### Composable
+
+Tuples, being objects, can be made of other tuples:
+
+```javascript
+console.log( Tuple(Tuple(1, 2, 3), Tuple(4, 5, 6)) === Tuple(Tuple(1, 2, 3), Tuple(4, 5, 6)) ); // true
+```
+
 #### Frozen
 
 You cannot add, remove or modify property on a tuple.
 
-### Not Iterable
+#### Not Iterable
 
 You can't loop over a Tuple directly, but properties **are** accessible at index `[0]`, `[1]`, `[2]` and so on.
 
@@ -67,14 +75,6 @@ const tuple = Tuple(1, 2, 3);
 
 Array.from(tuple).forEach(t => console.log(t));
 
-```
-
-#### Composable
-
-Tuples, being objects, can be made of other tuples:
-
-```javascript
-console.log( Tuple(Tuple(1, 2, 3), Tuple(4, 5, 6)) === Tuple(Tuple(1, 2, 3), Tuple(4, 5, 6)) ); // true
 ```
 
 ## How It Works
