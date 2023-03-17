@@ -34,7 +34,7 @@ module.exports = function Tuple(...args)
 
 		if(type === 'symbol')
 		{
-			throw new globalThis.Error('Symbols cannot participate in Tuples (yet).');
+			throw new globalThis.Error('Symbols cannot participate in Tuples.');
 		}
 
 		mode = mode ?? canMap;
