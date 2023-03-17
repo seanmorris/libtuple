@@ -1,8 +1,11 @@
-const terminator = Object.create(null);
-const tuple   = Symbol('tuple');
 const WeakMap = globalThis.WeakMap;
 const Map     = globalThis.Map;
 const refTree = new WeakMap;
+const terminator = Object.create(null);
+const baseTuple  = Object.create(null);
+baseTuple.toString = () => '[Object Tuple]';
+Object.freeze(terminator);
+Object.freeze(baseTuple);
 
 module.exports = function Tuple(...args)
 {
@@ -22,9 +25,8 @@ module.exports = function Tuple(...args)
 	let part   = [];
 	let map    = refTree;
 
-	while(args.length)
+	for(const arg of args)
 	{
-		const arg    = args.shift();
 		const type   = typeof arg;
 		const canMap = arg !== null && (type === 'object' || type === 'function');
 
@@ -45,7 +47,7 @@ module.exports = function Tuple(...args)
 		{
 			if(canMap)
 			{
-				prefix = JSON.stringify(part)
+				prefix = JSON.stringify(part.map(p => `${typeof p}::${p}`))
 			}
 
 			part = [arg];
@@ -79,12 +81,7 @@ module.exports = function Tuple(...args)
 
 	if(!mode)
 	{
-		part = JSON.stringify(part);
-
-		if(!maps)
-		{
-			return part;
-		}
+		part = JSON.stringify(part.map(p => `${typeof p}::${p}`))
 
 		if(!map.has(terminator))
 		{
@@ -93,7 +90,9 @@ module.exports = function Tuple(...args)
 
 		if(!map.get(terminator).prefixMap.has(part))
 		{
-			const result  = Object.create(null);
+			const result = Object.create(baseTuple);
+			result.length = args.length;
+			Object.assign(result, args);
 			Object.freeze(result);
 
 			map.get(terminator).prefixMap.set(part, result);
@@ -109,7 +108,9 @@ module.exports = function Tuple(...args)
 
 	if(!map.get(terminator).result)
 	{
-		const result  = Object.create(null);
+		const result  = Object.create(baseTuple);
+		result.length = args.length;
+		Object.assign(result, args);
 		Object.freeze(result);
 
 		map.get(terminator).result = result;

@@ -1,5 +1,5 @@
 # libtuple.js
-*Memory-efficient tuple implementation*
+*Memory-efficient tuple implementation in 2.2kB*
 
 ### Install with NPM
 
@@ -59,12 +59,10 @@ And that's where prefix-trees come in. Before constructing a tree of `WeakMaps`,
 
 Organizing the hierarchy wiht the scalar prefixes *after* the objects allows us to exploit the `WeakMap`'s garbage collection behavior. Once the object keys are GC'ed, so are the entries of the `WeakMap`. Holding a key here does not prevent objects from being GC'ed, so the branches of the internal tuple tree only stay in-memory as long as the objects they're comprised of.
 
-In the most basic case of a purely scalar-comprised tuple, a string representation will be used.
-
 ## Limitations
 
 * `Symbol`s cannot participate in `tuples`.
-* The library cannot tell the difference between `null` and `undefined`.
+* ~~The library cannot tell the difference between `null` and `undefined`~~.
 
 ## Building
 
