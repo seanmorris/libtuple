@@ -62,7 +62,7 @@ console.log( Tuple(Tuple(1, 2), Tuple(3, 4)) === Tuple(Tuple(1, 2), Tuple(3, 4))
 
 #### Frozen
 
-You cannot add, remove or modify property on a tuple.
+You cannot add, remove or modify any property on a tuple.
 
 #### Not Iterable
 
