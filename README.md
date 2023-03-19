@@ -60,6 +60,21 @@ console.log( Tuple(Tuple(1, 2), Tuple(3, 4)) === Tuple(Tuple(1, 2), Tuple(3, 4))
 
 You cannot add, remove or modify any property on a tuple.
 
+#### Not Iterable
+
+You can access properties like `[0]`, `[1]`, and `.length` on a tuple, but they are not arrays. You can get equivalent array values quite easily with `Array.from()`:
+
+```javascript
+const tuple = Tuple('a', 'b', 'c');
+
+console.log( tuple[1] ) // 'b'
+
+Array.from(tuple).map(t => console.log(t));
+// 'a'
+// 'b'
+// 'c'
+```
+
 ## How It Works
 
 A *tuple* is a type represented by a sequence of values. Unlike arrays, where `[1,2] !== [1,2]`, since, although they hold the same values, the actual object references are different. Tuples give you `Tuple(1,2) === Tuple(1,2)`.
