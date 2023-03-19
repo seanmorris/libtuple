@@ -45,9 +45,9 @@ const a = [];
 Tuple( a ) === Tuple( a ); // true :)
 ```
 
-### Tuples are...
+## Tuples are...
 
-#### Composable
+### Composable
 
 Tuples can be members of of other tuples. This works as expected:
 ```javascript
@@ -55,7 +55,7 @@ console.log( Tuple(Tuple(1, 2), Tuple(3, 4)) === Tuple(Tuple(1, 2), Tuple(3, 4))
 // true
 ```
 
-#### Frozen
+### Frozen
 
 You cannot add, remove or modify any property on a tuple.
 ```javascript
@@ -67,7 +67,7 @@ console.log( tuple[0] ); // 'a'
 
 ````
 
-#### Not Iterable
+### Not Iterable
 
 You can access properties like `[0]`, `[1]`, and `.length` on a tuple, but they are not arrays. You can get equivalent array values quite easily with `Array.from()`:
 
