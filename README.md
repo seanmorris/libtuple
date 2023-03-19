@@ -65,7 +65,7 @@ tuple[0] = 'NEW VALUE';
 
 console.log( tuple[0] ); // 'a'
 
-````
+```
 
 ### Not Iterable
 
