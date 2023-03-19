@@ -33,7 +33,7 @@ const c = new Date;
 console.log( Tuple(a, b, c, 1, 2, 3) === Tuple(a, b, c, 1, 2, 3) ); //true
 ```
 
-Watch out for the following however, this does not work as one might expect. In this example, each `[]` represents a unique object, so the following returns false:
+Watch out for the following however, object references can be tricky. In this example, each `[]` represents a unique object, so the following returns false:
 ```javascript
 Tuple( [] ) === Tuple( [] ); // FALSE!!!
 ```
