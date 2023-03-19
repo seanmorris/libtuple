@@ -50,7 +50,6 @@ Tuple( a ) === Tuple( a ); // true :)
 #### Composable
 
 Tuples can be members of of other tuples. This works as expected:
-
 ```javascript
 console.log( Tuple(Tuple(1, 2), Tuple(3, 4)) === Tuple(Tuple(1, 2), Tuple(3, 4)) );
 // true
@@ -59,6 +58,14 @@ console.log( Tuple(Tuple(1, 2), Tuple(3, 4)) === Tuple(Tuple(1, 2), Tuple(3, 4))
 #### Frozen
 
 You cannot add, remove or modify any property on a tuple.
+```javascript
+const tuple = Tuple('a', 'b', 'c');
+
+tuple[0] = 'NEW VALUE';
+
+console.log( tuple[0] ); // 'a'
+
+````
 
 #### Not Iterable
 
