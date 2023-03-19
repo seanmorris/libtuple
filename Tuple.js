@@ -1,21 +1,20 @@
 const refTree      = new WeakMap;
+const scalarMap    = new Map;
 const terminator   = Object.create(null);
 const baseTuple    = Object.create(null);
-baseTuple.toString = () => '[Object Tuple]';
+
+baseTuple[Symbol.toStringTag] = 'Tuple';
+baseTuple.toString = Object.prototype.toString;
 
 Object.freeze(terminator);
 Object.freeze(baseTuple);
 
-module.exports = function Tuple(...args)
-{
+const registry = new FinalizationRegistry(held => scalarMap.delete(held));
+
+module.exports = function Tuple(...args){
 	if(new.target)
 	{
 		throw new Error('"Tuple" is not a constructor. Create a Tuple by invoking the function directly.');
-	}
-
-	if(!args.length)
-	{
-		return '[]';
 	}
 
 	let prefix = null;
@@ -65,7 +64,7 @@ module.exports = function Tuple(...args)
 
 		maps = map.get(arg);
 		map  = maps.map;
-		
+
 		if(prefix)
 		{
 			if(!maps.prefixMap.has(prefix))
@@ -88,12 +87,26 @@ module.exports = function Tuple(...args)
 
 		if(!maps)
 		{
-			return part;
+			const result = Object.create(baseTuple);
+			Object.assign(result, {length:args.length, ...args});
+			Object.freeze(result);
+
+			if(!scalarMap.has(part))
+			{
+				registry.register(result, part);
+				scalarMap.set(part, new WeakRef(result));
+				return result;
+			}
+			else
+			{
+				return scalarMap.get(part).deref();
+			}
 		}
 
 		if(!map.get(terminator).prefixMap.has(part))
 		{
 			const result = Object.create(baseTuple);
+			Object.assign(result, {length:args.length, ...args});
 			Object.freeze(result);
 
 			map.get(terminator).prefixMap.set(part, result);
@@ -105,6 +118,7 @@ module.exports = function Tuple(...args)
 	if(!map.get(terminator).result)
 	{
 		const result  = Object.create(baseTuple);
+		Object.assign(result, {length:args.length, ...args});
 		Object.freeze(result);
 
 		map.get(terminator).result = result;
@@ -112,3 +126,5 @@ module.exports = function Tuple(...args)
 
 	return map.get(terminator).result;
 }
+
+Object.defineProperty(module.exports, 'scalarsCached', {get: () => scalarMap.size});

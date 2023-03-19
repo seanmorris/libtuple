@@ -1,9 +1,21 @@
 const test   = require('node:test');
 const assert = require('node:assert/strict');
-
 const Tuple  = require('./Tuple');
+const tests  = [];
 
-test('Identical Primitive Test', t => {
+tests.push(test('toString Tag Test', t => {
+	const tuple = Tuple();
+
+	assert.strictEqual('[object Tuple]', String(tuple));
+}));
+
+tests.push(test('Null Tuple Test', t => {
+	const tuple = Tuple();
+
+	assert.strictEqual(Tuple(), Tuple());
+}));
+
+tests.push(test('Identical Primitive Test', t => {
 	for(let i = 1; i < 100; i++)
 	{
 		const numbers = Array(i).fill(0).map((_,k) => k);
@@ -13,9 +25,9 @@ test('Identical Primitive Test', t => {
 
 		assert.strictEqual(Tuple(...numbersA), Tuple(...numbersB));
 	}
-});
+}));
 
-test('Non Identical Primitive Test', t => {
+tests.push(test('Non Identical Primitive Test', t => {
 	for(let i = 1; i < 100; i++)
 	{
 		const numbers = Array(i).fill(0).map((_,k) => k);
@@ -23,17 +35,17 @@ test('Non Identical Primitive Test', t => {
 		const numbersA = numbers.slice();
 		const numbersB = numbers.slice();
 
-		assert.strictEqual(Tuple(...numbersA), Tuple(...numbersB));
+		numbersB[ Math.trunc(i/2) ] = 'CHANGED';
+
+		assert.notEqual(Tuple(...numbersA), Tuple(...numbersB));
 	}
-});
+}));
 
-test('Null vs Undefined', t => {
-
+tests.push(test('Null vs Undefined', t => {
 	assert.notEqual(Tuple(null), Tuple(void 0));
+}));
 
-});
-
-test('Identical Object Test', t => {
+tests.push(test('Identical Object Test', t => {
 	for(let i = 1; i < 100; i++)
 	{
 		const objects = Array(i).fill(0).map((_,k) => ({}));
@@ -42,9 +54,9 @@ test('Identical Object Test', t => {
 
 		assert.strictEqual(Tuple(...objectsA), Tuple(...objectsB));
 	}
-});
+}));
 
-test('Non Identical Object Test', t => {
+tests.push(test('Non Identical Object Test', t => {
 	for(let i = 1; i < 100; i++)
 	{
 		const objects = Array(i).fill(0).map((_,k) => ({}));
@@ -55,9 +67,9 @@ test('Non Identical Object Test', t => {
 
 		assert.notEqual(Tuple(...objectsA), Tuple(...objectsB));
 	}
-});
+}));
 
-test('Identical Interpolated 2 Test', t => {
+tests.push(test('Identical Interpolated 2 Test', t => {
 	for(let i = 1; i < 100; i++)
 	{
 		const mixed = Array(i).fill(0).map((_,k) => k % 2 ? {[k]:k} : k );
@@ -74,9 +86,9 @@ test('Identical Interpolated 2 Test', t => {
 
 		assert.strictEqual(Tuple(...mixedA), Tuple(...mixedB));
 	}
-});
+}));
 
-test('Non Identical Interpolated 2 Test', t => {
+tests.push(test('Non Identical Interpolated 2 Test', t => {
 	for(let i = 1; i < 100; i++)
 	{
 		const mixed = Array(i).fill(0).map((_,k) => k % 2 ? {[k]:k} : k );
@@ -98,9 +110,9 @@ test('Non Identical Interpolated 2 Test', t => {
 
 		assert.notEqual(Tuple(...mixedA), Tuple(...mixedB));
 	}
-});
+}));
 
-test('Identical Interpolated 3 Test', t => {
+tests.push(test('Identical Interpolated 3 Test', t => {
 	for(let i = 1; i < 100; i++)
 	{
 		const mixed = Array(i).fill(0).map((_,k) => k % 3 ? {[k]:k} : k );
@@ -117,9 +129,9 @@ test('Identical Interpolated 3 Test', t => {
 
 		assert.strictEqual(Tuple(...mixedA), Tuple(...mixedB));
 	}
-});
+}));
 
-test('Non Identical Interpolated 3 Test', t => {
+tests.push(test('Non Identical Interpolated 3 Test', t => {
 	for(let i = 1; i < 100; i++)
 	{
 		const mixed = Array(i).fill(0).map((_,k) => k % 3 ? {[k]:k} : k );
@@ -141,9 +153,9 @@ test('Non Identical Interpolated 3 Test', t => {
 
 		assert.notEqual(Tuple(...mixedA), Tuple(...mixedB));
 	}
-});
+}));
 
-test('Identical Interpolated 4 Test', t => {
+tests.push(test('Identical Interpolated 4 Test', t => {
 	for(let i = 1; i < 100; i++)
 	{
 		const mixed = Array(i).fill(0).map((_,k) => k % 4 ? {[k]:k} : k );
@@ -160,9 +172,9 @@ test('Identical Interpolated 4 Test', t => {
 
 		assert.strictEqual(Tuple(...mixedA), Tuple(...mixedB));
 	}
-});
+}));
 
-test('Non Identical Interpolated 4 Test', t => {
+tests.push(test('Non Identical Interpolated 4 Test', t => {
 	for(let i = 1; i < 100; i++)
 	{
 		const mixed = Array(i).fill(0).map((_,k) => k % 4 ? {[k]:k} : k );
@@ -184,9 +196,9 @@ test('Non Identical Interpolated 4 Test', t => {
 
 		assert.notEqual(Tuple(...mixedA), Tuple(...mixedB));
 	}
-});
+}));
 
-test('Identical Interpolated 5 Test', t => {
+tests.push(test('Identical Interpolated 5 Test', t => {
 	for(let i = 1; i < 100; i++)
 	{
 		const mixed = Array(i).fill(0).map((_,k) => k % 5 ? {[k]:k} : k );
@@ -203,9 +215,9 @@ test('Identical Interpolated 5 Test', t => {
 
 		assert.strictEqual(Tuple(...mixedA), Tuple(...mixedB));
 	}
-});
+}));
 
-test('Non Identical Interpolated 5 Test', t => {
+tests.push(test('Non Identical Interpolated 5 Test', t => {
 	for(let i = 1; i < 100; i++)
 	{
 		const mixed = Array(i).fill(0).map((_,k) => k % 5 ? {[k]:k} : k );
@@ -227,9 +239,9 @@ test('Non Identical Interpolated 5 Test', t => {
 
 		assert.notEqual(Tuple(...mixedA), Tuple(...mixedB));
 	}
-});
+}));
 
-test('Scalar Subset Test', t => {
+tests.push(test('Scalar Subset Test', t => {
 	const numbers  = Array(100).fill(0).map((_,k) => ({}));
 	const numbersA = numbers.slice();
 	for(let i = 1; i < 100; i++)
@@ -237,9 +249,9 @@ test('Scalar Subset Test', t => {
 		const numbersB = numbers.slice(0,i);
 		assert.notEqual(Tuple(...numbersA), Tuple(...numbersB));
 	}
-});
+}));
 
-test('Object Subset Test', t => {
+tests.push(test('Object Subset Test', t => {
 	const objects  = Array(100).fill(0).map((_,k) => ({}));
 	const objectsA = objects.slice();
 	for(let i = 1; i < 100; i++)
@@ -247,9 +259,9 @@ test('Object Subset Test', t => {
 		const objectsB = objects.slice(0,i);
 		assert.notEqual(Tuple(...objectsA), Tuple(...objectsB));
 	}
-});
+}));
 
-test('Interpolated 2 Subset Test', t => {
+tests.push(test('Interpolated 2 Subset Test', t => {
 	{
 		const mixed = Array(100).fill(0).map((_,k) => k % 2 ? {[k]:k} : k );
 		const mixedA = mixed.slice();
@@ -270,9 +282,9 @@ test('Interpolated 2 Subset Test', t => {
 			assert.notEqual(Tuple(...mixedA), Tuple(...mixedB));
 		}
 	}
-});
+}));
 
-test('Interpolated 3 Subset Test', t => {
+tests.push(test('Interpolated 3 Subset Test', t => {
 	{
 		const mixed = Array(100).fill(0).map((_,k) => k % 3 ? {[k]:k} : k );
 		const mixedA = mixed.slice();
@@ -293,9 +305,9 @@ test('Interpolated 3 Subset Test', t => {
 			assert.notEqual(Tuple(...mixedA), Tuple(...mixedB));
 		}
 	}
-});
+}));
 
-test('Interpolated 4 Subset Test', t => {
+tests.push(test('Interpolated 4 Subset Test', t => {
 	{
 		const mixed = Array(100).fill(0).map((_,k) => k % 4 ? {[k]:k} : k );
 		const mixedA = mixed.slice();
@@ -316,9 +328,9 @@ test('Interpolated 4 Subset Test', t => {
 			assert.notEqual(Tuple(...mixedA), Tuple(...mixedB));
 		}
 	}
-});
+}));
 
-test('Switched Scalar Subset Test', t => {
+tests.push(test('Switched Scalar Subset Test', t => {
 	const numbers  = Array(100).fill(0).map((_,k) => ({}));
 	const numbersA = numbers.slice();
 		for(let i = 1; i < 100; i++)
@@ -326,9 +338,9 @@ test('Switched Scalar Subset Test', t => {
 		const numbersB = numbers.slice(0,i);
 		assert.notEqual(Tuple(...numbersB), Tuple(...numbersA));
 	}
-});
+}));
 
-test('Switched Object Subset Test', t => {
+tests.push(test('Switched Object Subset Test', t => {
 	const objects  = Array(100).fill(0).map((_,k) => ({}));
 	const objectsA = objects.slice();
 		for(let i = 1; i < 100; i++)
@@ -336,9 +348,9 @@ test('Switched Object Subset Test', t => {
 		const objectsB = objects.slice(0,i);
 		assert.notEqual(Tuple(...objectsB), Tuple(...objectsA));
 	}
-});
+}));
 
-test('Switched Interpolated 2 Subset Test', t => {
+tests.push(test('Switched Interpolated 2 Subset Test', t => {
 	{
 		const mixed = Array(100).fill(0).map((_,k) => k % 2 ? {[k]:k} : k );
 		const mixedA = mixed.slice();
@@ -359,9 +371,9 @@ test('Switched Interpolated 2 Subset Test', t => {
 			assert.notEqual(Tuple(...mixedB), Tuple(...mixedA));
 		}
 	}
-});
+}));
 
-test('Switched Interpolated 3 Subset Test', t => {
+tests.push(test('Switched Interpolated 3 Subset Test', t => {
 	{
 		const mixed = Array(100).fill(0).map((_,k) => k % 3 ? {[k]:k} : k );
 		const mixedA = mixed.slice();
@@ -382,9 +394,9 @@ test('Switched Interpolated 3 Subset Test', t => {
 			assert.notEqual(Tuple(...mixedB), Tuple(...mixedA));
 		}
 	}
-});
+}));
 
-test('Switched Interpolated 4 Subset Test', t => {
+tests.push(test('Switched Interpolated 4 Subset Test', t => {
 	{
 		const mixed = Array(100).fill(0).map((_,k) => k % 4 ? {[k]:k} : k );
 		const mixedA = mixed.slice();
@@ -405,9 +417,9 @@ test('Switched Interpolated 4 Subset Test', t => {
 			assert.notEqual(Tuple(...mixedB), Tuple(...mixedA));
 		}
 	}
-});
+}));
 
-test('Changed Scalar Subset Test', t => {
+tests.push(test('Changed Scalar Subset Test', t => {
 	const numbers  = Array(100).fill(0).map((_,k) => ({}));
 	const numbersA = numbers.slice();
 	for(let i = 1; i < 100; i++)
@@ -416,9 +428,9 @@ test('Changed Scalar Subset Test', t => {
 		numbersB[ Math.trunc(i/2) ] = 'CHANGED';
 		assert.notEqual(Tuple(...numbersA), Tuple(...numbersB));
 	}
-});
+}));
 
-test('Changed Object Subset Test', t => {
+tests.push(test('Changed Object Subset Test', t => {
 	const objects  = Array(100).fill(0).map((_,k) => ({}));
 	const objectsA = objects.slice();
 	for(let i = 1; i < 100; i++)
@@ -427,9 +439,9 @@ test('Changed Object Subset Test', t => {
 		objectsB[ Math.trunc(i/2) ] = 'CHANGED';
 		assert.notEqual(Tuple(...objectsA), Tuple(...objectsB));
 	}
-});
+}));
 
-test('Changed Interpolated 2 Subset Test', t => {
+tests.push(test('Changed Interpolated 2 Subset Test', t => {
 	{
 		const mixed = Array(100).fill(0).map((_,k) => k % 2 ? {[k]:k} : k );
 		const mixedA = mixed.slice();
@@ -452,9 +464,9 @@ test('Changed Interpolated 2 Subset Test', t => {
 			assert.notEqual(Tuple(...mixedA), Tuple(...mixedB));
 		}
 	}
-});
+}));
 
-test('Changed Interpolated 3 Subset Test', t => {
+tests.push(test('Changed Interpolated 3 Subset Test', t => {
 	{
 		const mixed = Array(100).fill(0).map((_,k) => k % 3 ? {[k]:k} : k );
 		const mixedA = mixed.slice();
@@ -477,9 +489,9 @@ test('Changed Interpolated 3 Subset Test', t => {
 			assert.notEqual(Tuple(...mixedA), Tuple(...mixedB));
 		}
 	}
-});
+}));
 
-test('Changed Interpolated 4 Subset Test', t => {
+tests.push(test('Changed Interpolated 4 Subset Test', t => {
 	{
 		const mixed = Array(100).fill(0).map((_,k) => k % 4 ? {[k]:k} : k );
 		const mixedA = mixed.slice();
@@ -502,9 +514,9 @@ test('Changed Interpolated 4 Subset Test', t => {
 			assert.notEqual(Tuple(...mixedA), Tuple(...mixedB));
 		}
 	}
-});
+}));
 
-test('Switched Changed Scalar Subset Test', t => {
+tests.push(test('Switched Changed Scalar Subset Test', t => {
 	const numbers  = Array(100).fill(0).map((_,k) => ({}));
 	const numbersA = numbers.slice();
 	for(let i = 1; i < 100; i++)
@@ -513,9 +525,9 @@ test('Switched Changed Scalar Subset Test', t => {
 		numbersB[ Math.trunc(i/2) ] = 'CHANGED';
 		assert.notEqual(Tuple(...numbersB), Tuple(...numbersA));
 	}
-});
+}));
 
-test('Switched Changed Object Subset Test', t => {
+tests.push(test('Switched Changed Object Subset Test', t => {
 	const objects  = Array(100).fill(0).map((_,k) => ({}));
 	const objectsA = objects.slice();
 	for(let i = 1; i < 100; i++)
@@ -524,9 +536,9 @@ test('Switched Changed Object Subset Test', t => {
 		objectsB[ Math.trunc(i/2) ] = 'CHANGED';
 		assert.notEqual(Tuple(...objectsB), Tuple(...objectsA));
 	}
-});
+}));
 
-test('Switched Changed Interpolated 2 Subset Test', t => {
+tests.push(test('Switched Changed Interpolated 2 Subset Test', t => {
 	{
 		const mixed = Array(100).fill(0).map((_,k) => k % 2 ? {[k]:k} : k );
 		const mixedA = mixed.slice();
@@ -549,9 +561,9 @@ test('Switched Changed Interpolated 2 Subset Test', t => {
 			assert.notEqual(Tuple(...mixedB), Tuple(...mixedA));
 		}
 	}
-});
+}));
 
-test('Switched Changed Interpolated 3 Subset Test', t => {
+tests.push(test('Switched Changed Interpolated 3 Subset Test', t => {
 	{
 		const mixed = Array(100).fill(0).map((_,k) => k % 3 ? {[k]:k} : k );
 		const mixedA = mixed.slice();
@@ -574,9 +586,9 @@ test('Switched Changed Interpolated 3 Subset Test', t => {
 			assert.notEqual(Tuple(...mixedB), Tuple(...mixedA));
 		}
 	}
-});
+}));
 
-test('Switched Changed Interpolated 4 Subset Test', t => {
+tests.push(test('Switched Changed Interpolated 4 Subset Test', t => {
 	{
 		const mixed = Array(100).fill(0).map((_,k) => k % 4 ? {[k]:k} : k );
 		const mixedA = mixed.slice();
@@ -599,4 +611,11 @@ test('Switched Changed Interpolated 4 Subset Test', t => {
 			assert.notEqual(Tuple(...mixedB), Tuple(...mixedA));
 		}
 	}
+}));
+
+Promise.allSettled(tests).then(() => {
+	const lastTest = () => test(`Ensure memory isn\'t leaking for scalar keys`, t => {
+		assert.strictEqual(0, Tuple.scalarsCached);
+	});
+	setTimeout(lastTest, 150);
 });

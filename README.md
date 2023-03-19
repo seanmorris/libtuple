@@ -78,7 +78,7 @@ Organizing the hierarchy with the scalar prefixes *after* the objects allows us 
 
 * `Symbol`s cannot participate in `tuples`.
 * ~~The library cannot tell the difference between `null` and `undefined`~~.
-* Purely scalar-based tuples are represented by strings, not objects.
+* ~~Purely scalar-based tuples are represented by strings, not objects.~~
 
 ## Building
 
