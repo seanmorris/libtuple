@@ -83,7 +83,7 @@ Tuple( a ) === Tuple( a ); // true :)
 
 ## Tuples are...
 
-*(`Groups`s, `Record`s, and `Dict`s are just specialized `Tuple`s)*
+*(Groupss, Records, and Dicts are just specialized Tuples)*
 
 ### Composable
 
