@@ -14,8 +14,6 @@ export default function Group(...args)
 	}
 
 	const tuples = args.map(a => Tuple(a)).sort((a, b) => a.index < b.index ? -1 : 1);
-	const sorted = tuples.map(t => t[0]);
-
-	const tagged = Tuple.bind({args: sorted, base});
+	const tagged = Tuple.bind({args: tuples.map(t => t[0]), base, length: args.length});
 	return tagged(marker, ...tuples);
 }

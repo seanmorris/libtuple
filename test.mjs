@@ -21,6 +21,7 @@ tests.push(test('Record Equality Test', t => {
 	const [a ,b, c] = [1, 2, 3];
 	assert.strictEqual(Record({a, b, c}), Record({c, b, a}));
 	assert.strictEqual(Record({c: 0, b: 1, a: 2}), Record({a: 2, b: 1, c: 0}));
+	assert.strictEqual(Record({c: 0, b: 1, a: 2}).length, 3);
 }));
 
 tests.push(test('Record Property Test', t => {
@@ -40,6 +41,9 @@ tests.push(test('Group Property Test', t => {
 	assert.strictEqual(g1[0], g2[0]);
 	assert.strictEqual(g1[1], g2[1]);
 	assert.strictEqual(g1[2], g2[2]);
+
+	assert.strictEqual(g1.length, 3);
+	assert.strictEqual(g2.length, 3);
 }));
 
 tests.push(test('Null Tuple Test', t => {

@@ -22,6 +22,6 @@ export default function BaseRecord(obj = {})
 	const keys = Object.keys(entries);
 	const values = Object.values(entries);
 
-	const tagged = Tuple.bind({args: obj, base});
+	const tagged = Tuple.bind({args: obj, base, length: entries.length});
 	return tagged(marker, Tuple(...keys), Tuple(...values));
 }
