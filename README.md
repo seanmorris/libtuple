@@ -83,6 +83,8 @@ Tuple( a ) === Tuple( a ); // true :)
 
 ## Tuples are...
 
+*(`Groups`s, `Record`s, and `Dict`s are just specialized `Tuple`s)*
+
 ### Composable
 
 Tuples can be members of of other tuples. This works as expected:
