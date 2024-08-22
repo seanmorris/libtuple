@@ -55,6 +55,8 @@ const [a ,b, c] = [1, 2, 3];
 Record({a, b, c}) === Record({c, b, a}); // true
 ```
 
+## Gotchas
+
 Watch out for the following however, object references can be tricky. In this example, each `[]` represents its own, unique object, so the following returns false:
 
 ```javascript
