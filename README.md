@@ -16,6 +16,8 @@ $ npm install libtuple
 import { Tuple, Group, Record } from 'libtuple';
 ```
 
+### Tuple()
+
 Pass a list of values to the `Tuple()` function. This value will be strictly equivalent to any tuple generated with the same values:
 
 ```javascript
@@ -26,11 +28,15 @@ const tuple321 = Tuple(3, 2, 1);
 tuple123 === tuple321; // false
 ```
 
+### Group()
+
 A `Group()` is similar to a `Tuple()`, except they're not ordered:
 
 ```javascript
 Group(3, 2, 1) === Group(1, 2, 3); // true
 ```
+
+### Record()
 
 A `Record()` works the same way, but works with keys & values, and is not ordered.
 
