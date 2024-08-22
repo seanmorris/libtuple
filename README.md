@@ -28,6 +28,16 @@ const tuple321 = Tuple(3, 2, 1);
 tuple123 === tuple321; // false
 ```
 
+This is true for tuples with objects as well:
+
+```javascript
+const a = {};
+const b = [];
+const c = new Date;
+
+console.log( Tuple(a, b, c, 1, 2, 3) === Tuple(a, b, c, 1, 2, 3) ); //true
+```
+
 ### Group()
 
 A `Group()` is similar to a `Tuple()`, except they're not ordered:
@@ -43,16 +53,6 @@ A `Record()` works the same way, but works with keys & values, and is not ordere
 ```javascript
 const [a ,b, c] = [1, 2, 3];
 Record({a, b, c}) === Record({c, b, a}); // true
-```
-
-This is true for tuples with objects as well:
-
-```javascript
-const a = {};
-const b = [];
-const c = new Date;
-
-console.log( Tuple(a, b, c, 1, 2, 3) === Tuple(a, b, c, 1, 2, 3) ); //true
 ```
 
 Watch out for the following however, object references can be tricky. In this example, each `[]` represents its own, unique object, so the following returns false:
