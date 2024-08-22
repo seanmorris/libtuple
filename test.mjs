@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import Tuple from './Tuple.mjs';
 import Group from './Group.mjs';
 import Record from './Record.mjs';
+import Dict from './Dict.mjs';
 
 const tests  = [];
 
@@ -15,6 +16,23 @@ tests.push(test('toString Tag Test', t => {
 	assert.strictEqual(String(group),  '[object Group]');
 	assert.strictEqual(String(record), '[object Record]');
 	assert.strictEqual(String(tuple),  '[object Tuple]');
+}));
+
+tests.push(test('Group Property Test', t => {
+	const g1 = Group(1, 2, 3);
+	const g2 = Group(3, 2, 1);
+
+	assert.strictEqual(g1, g2);
+	assert.strictEqual(g1[0], g2[0]);
+	assert.strictEqual(g1[1], g2[1]);
+	assert.strictEqual(g1[2], g2[2]);
+
+	assert.strictEqual(g1.length, 3);
+	assert.strictEqual(g2.length, 3);
+}));
+
+tests.push(test('Group Equality Test', t => {
+	assert.strictEqual(Group(1, 2, 3), Group(3, 2, 1));
 }));
 
 tests.push(test('Record Equality Test', t => {
@@ -29,21 +47,17 @@ tests.push(test('Record Property Test', t => {
 	assert.strictEqual(record.b, 1);
 }));
 
-tests.push(test('Group Equality Test', t => {
-	assert.strictEqual(Group(1, 2, 3), Group(3, 2, 1));
+tests.push(test('Dict Equality Test', t => {
+	const [a ,b, c] = [1, 2, 3];
+	assert.strictEqual(Dict({a, b, c}), Dict({a, b, c}));
+	assert.strictEqual(Dict({a: 2, b: 1, c: 0}), Dict({a: 2, b: 1, c: 0}));
+	assert.notEqual(Dict({a: 2, b: 1, c: 0}), Dict({a: 2, b: 1, c: 1}));
+	assert.notEqual(Dict({c: 0, b: 1, a: 2}), Dict({a: 2, b: 1, c: 0}));
+	assert.strictEqual(Dict({c: 0, b: 1, a: 2}).length, 3);
 }));
 
-tests.push(test('Group Property Test', t => {
-	const g1 = Group(1, 2, 3);
-	const g2 = Group(3, 2, 1);
-
-	assert.strictEqual(g1, g2);
-	assert.strictEqual(g1[0], g2[0]);
-	assert.strictEqual(g1[1], g2[1]);
-	assert.strictEqual(g1[2], g2[2]);
-
-	assert.strictEqual(g1.length, 3);
-	assert.strictEqual(g2.length, 3);
+tests.push(test('Dict Property Test', t => {
+	assert.strictEqual(Dict({b: 1, a: 2}).b, 1);
 }));
 
 tests.push(test('Null Tuple Test', t => {

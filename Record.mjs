@@ -6,7 +6,7 @@ base.toString = Object.prototype.toString;
 const marker = {};
 Object.freeze(marker);
 
-export default function BaseRecord(obj = {})
+export default function Record(obj = {})
 {
 	if(new.target)
 	{
@@ -22,6 +22,6 @@ export default function BaseRecord(obj = {})
 	const keys = Object.keys(entries);
 	const values = Object.values(entries);
 
-	const tagged = Tuple.bind({args: obj, base, length: entries.length});
+	const tagged = Tuple.bind({args: obj, base, length: keys.length});
 	return tagged(marker, Tuple(...keys), Tuple(...values));
 }

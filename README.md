@@ -13,7 +13,7 @@ $ npm install libtuple
 `libtuple` is now ESM compliant!
 
 ```javascript
-import { Tuple, Group, Record } from 'libtuple';
+import { Tuple, Group, Record, Dict } from 'libtuple';
 ```
 
 ### Tuple()
@@ -53,6 +53,16 @@ A `Record()` works the same way, but works with keys & values, and is not ordere
 ```javascript
 const [a ,b, c] = [1, 2, 3];
 Record({a, b, c}) === Record({c, b, a}); // true
+```
+
+### Dict()
+
+A `Dict()` is like an ordered `Record()`:
+
+```javascript
+const [a ,b, c] = [1, 2, 3];
+Dict({a, b, c}) === Dict({a, b, c}); // true
+Dict({a, b, c}) === Dict({c, b, a}); // false
 ```
 
 ## Gotchas
