@@ -44,7 +44,7 @@ Watch out for the following however, object references can be tricky. In this ex
 Tuple( [] ) === Tuple( [] ); // FALSE!!!
 ```
 
-Use the same **object reference** to get the same tuple:
+Use the same ***object reference*** to get the same tuple:
 
 ```javascript
 const a = [];
