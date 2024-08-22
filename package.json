@@ -1,16 +1,19 @@
 {
-  "name": "libtuple",
-  "version": "0.0.6",
-  "author": "Sean Morris",
-  "description": "Memory-efficient tuple implementation.",
-  "repository": "https://github.com/seanmorris/libtuple.js",
-  "main": "Tuple.js",
-  "keywords":["tuples"],
-  "scripts": {
-    "test": "node --test test.js"
-  },
-  "license": "Apache 2.0",
-  "files": [
-    "Tuple.js"
-  ]
+	"name": "libtuple",
+	"version": "0.0.7",
+	"author": "Sean Morris",
+	"description": "Memory-efficient tuple implementation.",
+	"repository": "https://github.com/seanmorris/libtuple",
+	"main": "Tuple.mjs",
+	"keywords":["tuples"],
+	"scripts": {
+		"test": "node --test test.mjs"
+	},
+	"license": "Apache 2.0",
+	"files": [
+		"Tuple.mjs",
+		"README.md",
+		"LICENSE",
+		"NOTICE"
+	]
 }

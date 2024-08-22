@@ -1,7 +1,7 @@
-const refTree      = new WeakMap;
-const scalarMap    = new Map;
-const terminator   = Object.create(null);
-const baseTuple    = Object.create(null);
+const refTree    = new WeakMap;
+const scalarMap  = new Map;
+const terminator = Object.create(null);
+const baseTuple  = Object.create(null);
 
 baseTuple[Symbol.toStringTag] = 'Tuple';
 baseTuple.toString = Object.prototype.toString;
@@ -11,7 +11,8 @@ Object.freeze(baseTuple);
 
 const registry = new FinalizationRegistry(held => scalarMap.delete(held));
 
-module.exports = function Tuple(...args){
+export default function Tuple(...args)
+{
 	if(new.target)
 	{
 		throw new Error('"Tuple" is not a constructor. Create a Tuple by invoking the function directly.');
@@ -127,4 +128,4 @@ module.exports = function Tuple(...args){
 	return map.get(terminator).result;
 }
 
-Object.defineProperty(module.exports, 'scalarsCached', {get: () => scalarMap.size});
+Object.defineProperty(Tuple, 'scalarsCached', {get: () => scalarMap.size});

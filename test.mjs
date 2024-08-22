@@ -1,6 +1,7 @@
-const test   = require('node:test');
-const assert = require('node:assert/strict');
-const Tuple  = require('./Tuple');
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import Tuple from './Tuple.mjs';
+
 const tests  = [];
 
 tests.push(test('toString Tag Test', t => {

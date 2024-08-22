@@ -1,5 +1,6 @@
-# libtuple.js
-*Memory-efficient tuple implementation in 2.2kB*
+# libtuple
+
+*Memory-efficient tuple implementation in 2.5kB*
 
 ### Install with NPM
 
@@ -9,22 +10,26 @@ $ npm install libtuple
 
 ## Usage
 
-Import `Tuple` with `require`:
+`import` Tuple from 'libtuple';
+
 ```javascript
-const Tuple = require('libtuple/Tuple');
+import Tuple from 'libtuple';
 ````
 
 Pass a list of values to the `Tuple()` function:
+
 ```javascript
 const tuple123 = Tuple(1, 2, 3);
 ````
 
 This value will be strictly equivalent to any tuple generated with the same values:
+
 ```javascript
 tuple123 === Tuple(1, 2, 3); // true
 ````
 
 This is true for tuples with objects as well:
+
 ```javascript
 const a = {};
 const b = [];
@@ -34,11 +39,13 @@ console.log( Tuple(a, b, c, 1, 2, 3) === Tuple(a, b, c, 1, 2, 3) ); //true
 ```
 
 Watch out for the following however, object references can be tricky. In this example, each `[]` represents its own, unique object, so the following returns false:
+
 ```javascript
 Tuple( [] ) === Tuple( [] ); // FALSE!!!
 ```
 
 Use the same **object reference** to get the same tuple:
+
 ```javascript
 const a = [];
 
@@ -50,6 +57,7 @@ Tuple( a ) === Tuple( a ); // true :)
 ### Composable
 
 Tuples can be members of of other tuples. This works as expected:
+
 ```javascript
 console.log( Tuple(Tuple(1, 2), Tuple(3, 4)) === Tuple(Tuple(1, 2), Tuple(3, 4)) );
 // true
@@ -58,6 +66,7 @@ console.log( Tuple(Tuple(1, 2), Tuple(3, 4)) === Tuple(Tuple(1, 2), Tuple(3, 4))
 ### Frozen
 
 You cannot add, remove or modify any property on a tuple.
+
 ```javascript
 const tuple = Tuple('a', 'b', 'c');
 
@@ -99,13 +108,7 @@ Organizing the hierarchy with the scalar prefixes *after* the objects allows us 
 ## Limitations
 
 * `Symbol`s cannot participate in `tuples`.
-* ~~The library cannot tell the difference between `null` and `undefined`~~.
-* ~~Purely scalar-based tuples are represented by strings, not objects.~~
-
-## Building
-
-libtuple is a bog-standard CJS module with a single export and relatively mundane syntax. The source is meant to be executed directly. Minification is left up the the user and their bundler.
 
 ## Testing
 
-Run `npm run test` or `node --test test.js` in the terminal.
+Run `npm run test` or `node --test test.mjs` in the terminal.
