@@ -26,7 +26,7 @@ const tuple321 = Tuple(3, 2, 1);
 tuple123 === tuple321; // false
 ```
 
-A `Group()` is similar to a `Tuple()`, except their not ordered:
+A `Group()` is similar to a `Tuple()`, except they're not ordered:
 
 ```javascript
 Group(3, 2, 1) === Group(1, 2, 3); // true
