@@ -1,6 +1,6 @@
 # libtuple
 
-*Memory-efficient tuple implementation in 2.5kB*
+*Memory-efficient tuple implementation in ~3kB*
 
 ### Install with NPM
 
@@ -10,23 +10,34 @@ $ npm install libtuple
 
 ## Usage
 
-`import` Tuple from 'libtuple';
+`libtuple` is now ESM compliant!
 
 ```javascript
-import Tuple from 'libtuple';
-````
+import { Tuple, Group, Record } from 'libtuple';
+```
 
-Pass a list of values to the `Tuple()` function:
+Pass a list of values to the `Tuple()` function. This value will be strictly equivalent to any tuple generated with the same values:
 
 ```javascript
 const tuple123 = Tuple(1, 2, 3);
-````
+tuple123 === Tuple(1, 2, 3); // true
 
-This value will be strictly equivalent to any tuple generated with the same values:
+const tuple321 = Tuple(3, 2, 1);
+tuple123 === tuple321; // false
+```
+
+A `Group()` is similar to a `Tuple()`, except their not ordered:
 
 ```javascript
-tuple123 === Tuple(1, 2, 3); // true
-````
+Group(3, 2, 1) === Group(1, 2, 3); // true
+```
+
+A `Record()` works the same way, but works with keys & values, and is not ordered.
+
+```javascript
+const [a ,b, c] = [1, 2, 3];
+Record({a, b, c}) === Record({c, b, a}); // true
+```
 
 This is true for tuples with objects as well:
 

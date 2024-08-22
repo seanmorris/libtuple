@@ -1,10 +1,12 @@
-const refTree    = new WeakMap;
-const scalarMap  = new Map;
+const refTree = new WeakMap;
+const scalarMap = new Map;
 const terminator = Object.create(null);
-const baseTuple  = Object.create(null);
 
+const baseTuple = Object.create(null);
 baseTuple[Symbol.toStringTag] = 'Tuple';
 baseTuple.toString = Object.prototype.toString;
+
+let index = 0;
 
 Object.freeze(terminator);
 Object.freeze(baseTuple);
@@ -88,8 +90,8 @@ export default function Tuple(...args)
 
 		if(!maps)
 		{
-			const result = Object.create(baseTuple);
-			Object.assign(result, {length:args.length, ...args});
+			const result = Object.create(this ? this.base : baseTuple);
+			Object.assign(result, {length: args.length, index: index++, ...(this ? this.args : args)});
 			Object.freeze(result);
 
 			if(!scalarMap.has(part))
@@ -106,8 +108,8 @@ export default function Tuple(...args)
 
 		if(!map.get(terminator).prefixMap.has(part))
 		{
-			const result = Object.create(baseTuple);
-			Object.assign(result, {length:args.length, ...args});
+			const result = Object.create(this ? this.base : baseTuple);
+			Object.assign(result, {length: args.length, index: index++, ...(this ? this.args : args)});
 			Object.freeze(result);
 
 			map.get(terminator).prefixMap.set(part, result);
@@ -118,8 +120,8 @@ export default function Tuple(...args)
 
 	if(!map.get(terminator).result)
 	{
-		const result  = Object.create(baseTuple);
-		Object.assign(result, {length:args.length, ...args});
+		const result = Object.create(this ? this.base : baseTuple);
+		Object.assign(result, {length: args.length, index: index++, ...(this ? this.args : args)});
 		Object.freeze(result);
 
 		map.get(terminator).result = result;
