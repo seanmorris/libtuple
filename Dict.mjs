@@ -1,10 +1,22 @@
 import Tuple from "./Tuple.mjs";
+import { size, keys } from "./Tuple.mjs";
 
 const base = Object.create(null);
-base[Symbol.toStringTag] = 'Dict';
 base.toString = Object.prototype.toString;
-const marker = {};
-Object.freeze(marker);
+
+base[Symbol.toStringTag] = 'Dict';
+base[Symbol.iterator] = function() {
+	let index = 0;
+	return { next: () => {
+		const iteration = index++;
+		if(this[size] < index)
+		{
+			return { done: true };
+		}
+		return {value: [this[keys][iteration], this[this[keys][iteration]]], done: false };
+	}};
+};
+
 
 export default function Dict(obj = {})
 {
@@ -21,6 +33,6 @@ export default function Dict(obj = {})
 	const keys = Object.keys(obj);
 	const values = Object.values(obj);
 
-	const tagged = Tuple.bind({args: obj, base, length: keys.length});
-	return tagged(marker, Tuple(...keys), Tuple(...values));
+	const tagged = Tuple.bind({args: obj, base, length: keys.length, keys});
+	return tagged('dict', Tuple(...keys), Tuple(...values));
 }

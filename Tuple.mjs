@@ -2,14 +2,29 @@ const refTree = new WeakMap;
 const scalarMap = new Map;
 const terminator = Object.create(null);
 
-const baseTuple = Object.create(null);
-baseTuple[Symbol.toStringTag] = 'Tuple';
-baseTuple.toString = Object.prototype.toString;
+export const size = Symbol('size');
+export const _index = Symbol('index');
+export const keys = Symbol('keys');
+
+const base = Object.create(null);
+base.toString = Object.prototype.toString;
+base[Symbol.toStringTag] = 'Tuple';
+base[Symbol.iterator] = function() {
+	let index = 0;
+	return { next: () => {
+		const iteration = index++;
+		if(this[size] < index)
+		{
+			return { done: true };
+		}
+		return { value: this[iteration], done: false };
+	}};
+};
 
 let index = 0;
 
 Object.freeze(terminator);
-Object.freeze(baseTuple);
+Object.freeze(base);
 
 const registry = new FinalizationRegistry(held => scalarMap.delete(held));
 
@@ -29,13 +44,13 @@ export default function Tuple(...args)
 	for(const arg of args)
 	{
 		const type   = typeof arg;
-		const canMap = arg !== null && (type === 'object' || type === 'function');
+		const canMap = arg !== null && (type === 'object' || type === 'symbol' || type === 'function');
 
 		prefix = null;
 
-		if(type === 'symbol')
+		if(type === 'symbol' && Symbol.keyFor(arg))
 		{
-			throw new Error('Symbols cannot participate in Tuples.');
+			throw new Error('Registered symbols (`Symbol.for(...)`) cannot participate in Tuples.');
 		}
 
 		mode = mode ?? canMap;
@@ -86,12 +101,13 @@ export default function Tuple(...args)
 
 	if(!mode)
 	{
-		part = JSON.stringify(part.map(p => `${typeof p}::${p}`))
+		part = JSON.stringify(part.map(p => `${typeof p}::${p}`));
 
 		if(!maps)
 		{
-			const result = Object.create(this ? this.base : baseTuple);
-			Object.assign(result, {length: (this ? this.length : args.length), index: index++, ...(this ? this.args : args)});
+			const a = (this ? this.args : args);
+			const result = Object.create(this ? this.base : base);
+			Object.assign(result, {...a, [_index]: index++, [size]: Array.isArray(a) ? a.length : Object.keys(a).length, [keys]: this && this.keys});
 			Object.freeze(result);
 
 			if(!scalarMap.has(part))
@@ -108,8 +124,9 @@ export default function Tuple(...args)
 
 		if(!map.get(terminator).prefixMap.has(part))
 		{
-			const result = Object.create(this ? this.base : baseTuple);
-			Object.assign(result, {length: (this ? this.length : args.length), index: index++, ...(this ? this.args : args)});
+			const a = (this ? this.args : args);
+			const result = Object.create(this ? this.base : base);
+			Object.assign(result, {...a, [_index]: index++, [size]: Array.isArray(a) ? a.length : Object.keys(a).length, [keys]: this && this.keys});
 			Object.freeze(result);
 
 			map.get(terminator).prefixMap.set(part, result);
@@ -120,8 +137,9 @@ export default function Tuple(...args)
 
 	if(!map.get(terminator).result)
 	{
-		const result = Object.create(this ? this.base : baseTuple);
-		Object.assign(result, {length: (this ? this.length : args.length), index: index++, ...(this ? this.args : args)});
+		const a = (this ? this.args : args);
+		const result = Object.create(this ? this.base : base);
+		Object.assign(result, {...a, [_index]: index++, [size]: Array.isArray(a) ? a.length : Object.keys(a).length, [keys]: this && this.keys});
 		Object.freeze(result);
 
 		map.get(terminator).result = result;

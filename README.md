@@ -48,7 +48,7 @@ Group(3, 2, 1) === Group(1, 2, 3); // true
 
 ### Record()
 
-A `Record()` works the same way, but works with keys & values, and is not ordered.
+A `Record()` works the same way, but works with keys & values, and is **not** ordered.
 
 ```javascript
 const [a ,b, c] = [1, 2, 3];
@@ -107,21 +107,6 @@ console.log( tuple[0] ); // 'a'
 
 ```
 
-### Not Iterable
-
-You can access properties like `[0]`, `[1]`, and `.length` on a tuple, but they are not arrays. You can get equivalent array values quite easily with `Array.from()`:
-
-```javascript
-const tuple = Tuple('a', 'b', 'c');
-
-console.log( tuple[1] ) // 'b'
-
-Array.from(tuple).map(t => console.log(t));
-// 'a'
-// 'b'
-// 'c'
-```
-
 ## How It Works
 
 A *tuple* is a type represented by a sequence of values. Unlike arrays, where `[1,2] !== [1,2]`, since, although they hold the same values, the actual object references are different. Tuples give you `Tuple(1,2) === Tuple(1,2)`.
@@ -138,7 +123,7 @@ Organizing the hierarchy with the scalar prefixes *after* the objects allows us 
 
 ## Limitations
 
-* `Symbol`s cannot participate in `tuples`.
+* Registered `Symbol`s cannot participate in `Tuples`. (i.e. created with `Symbol.for()`; [more info](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol#shared_symbols_in_the_global_symbol_registry))
 
 ## Testing
 

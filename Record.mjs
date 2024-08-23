@@ -1,10 +1,21 @@
 import Tuple from "./Tuple.mjs";
+import { size, keys } from "./Tuple.mjs";
 
 const base = Object.create(null);
-base[Symbol.toStringTag] = 'Record';
 base.toString = Object.prototype.toString;
-const marker = {};
-Object.freeze(marker);
+
+base[Symbol.toStringTag] = 'Record';
+base[Symbol.iterator] = function() {
+	let index = 0;
+	return { next: () => {
+		const iteration = index++;
+		if(this[size] < index)
+		{
+			return { done: true };
+		}
+		return {value: [this[keys][iteration], this[this[keys][iteration]]], done: false };
+	}};
+};
 
 export default function Record(obj = {})
 {
@@ -22,6 +33,6 @@ export default function Record(obj = {})
 	const keys = Object.keys(entries);
 	const values = Object.values(entries);
 
-	const tagged = Tuple.bind({args: obj, base, length: keys.length});
-	return tagged(marker, Tuple(...keys), Tuple(...values));
+	const tagged = Tuple.bind({args: obj, base, length: keys.length, keys});
+	return tagged(Tuple(...keys), Tuple(...values), 'record');
 }

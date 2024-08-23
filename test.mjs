@@ -6,6 +6,8 @@ import Group from './Group.mjs';
 import Record from './Record.mjs';
 import Dict from './Dict.mjs';
 
+import { size } from "./Tuple.mjs";
+
 const tests  = [];
 
 tests.push(test('toString Tag Test', t => {
@@ -18,56 +20,12 @@ tests.push(test('toString Tag Test', t => {
 	assert.strictEqual(String(tuple),  '[object Tuple]');
 }));
 
-tests.push(test('Group Property Test', t => {
-	const g1 = Group(1, 2, 3);
-	const g2 = Group(3, 2, 1);
-
-	assert.strictEqual(g1, g2);
-	assert.strictEqual(g1[0], g2[0]);
-	assert.strictEqual(g1[1], g2[1]);
-	assert.strictEqual(g1[2], g2[2]);
-
-	assert.strictEqual(g1.length, 3);
-	assert.strictEqual(g2.length, 3);
-}));
-
-tests.push(test('Group Equality Test', t => {
-	assert.strictEqual(Group(1, 2, 3), Group(3, 2, 1));
-}));
-
-tests.push(test('Record Equality Test', t => {
-	const [a ,b, c] = [1, 2, 3];
-	assert.strictEqual(Record({a, b, c}), Record({c, b, a}));
-	assert.strictEqual(Record({c: 0, b: 1, a: 2}), Record({a: 2, b: 1, c: 0}));
-	assert.strictEqual(Record({c: 0, b: 1, a: 2}).length, 3);
-}));
-
-tests.push(test('Record Property Test', t => {
-	const record = Record({b: 1, a: 2});
-	assert.strictEqual(record.b, 1);
-}));
-
-tests.push(test('Dict Equality Test', t => {
-	const [a ,b, c] = [1, 2, 3];
-	assert.strictEqual(Dict({a, b, c}), Dict({a, b, c}));
-	assert.strictEqual(Dict({a: 2, b: 1, c: 0}), Dict({a: 2, b: 1, c: 0}));
-	assert.notEqual(Dict({a: 2, b: 1, c: 0}), Dict({a: 2, b: 1, c: 1}));
-	assert.notEqual(Dict({c: 0, b: 1, a: 2}), Dict({a: 2, b: 1, c: 0}));
-	assert.strictEqual(Dict({c: 0, b: 1, a: 2}).length, 3);
-}));
-
-tests.push(test('Dict Property Test', t => {
-	assert.strictEqual(Dict({b: 1, a: 2}).b, 1);
-}));
-
 tests.push(test('Null Tuple Test', t => {
-	const tuple = Tuple();
-
 	assert.strictEqual(Tuple(), Tuple());
 }));
 
 tests.push(test('Identical Primitive Test', t => {
-	for(let i = 1; i < 100; i++)
+	for(let i = 0; i < 100; i++)
 	{
 		const numbers = Array(i).fill(0).map((_,k) => k);
 
@@ -664,9 +622,102 @@ tests.push(test('Switched Changed Interpolated 4 Subset Test', t => {
 	}
 }));
 
-Promise.allSettled(tests).then(() => {
-	const lastTest = () => test(`Ensure memory isn\'t leaking for scalar keys`, t => {
-		assert.strictEqual(0, Tuple.scalarsCached);
-	});
-	setTimeout(lastTest, 150);
+tests.push(test('Group Property Test', t => {
+	const g1 = Group(1, 2, 3);
+	const g2 = Group(3, 2, 1);
+
+	assert.strictEqual(g1, g2);
+	assert.strictEqual(g1[0], g2[0]);
+	assert.strictEqual(g1[1], g2[1]);
+	assert.strictEqual(g1[2], g2[2]);
+
+	assert.strictEqual(g1[size], 3);
+	assert.strictEqual(g2[size], 3);
+}));
+
+tests.push(test('Group Equality Test', t => {
+	assert.strictEqual(Group(1, 2, 3), Group(3, 2, 1));
+}));
+
+tests.push(test('Record Equality Test', t => {
+	const [a ,b, c] = [1, 2, 3];
+	assert.strictEqual(Record({a, b, c}), Record({c, b, a}));
+	assert.strictEqual(Record({c: 0, b: 1, a: 2}), Record({a: 2, b: 1, c: 0}));
+	assert.strictEqual(Record({c: 0, b: 1, a: 2})[size], 3);
+}));
+
+tests.push(test('Record Property Test', t => {
+	const record = Record({b: 1, a: 2});
+	assert.strictEqual(record.b, 1);
+}));
+
+tests.push(test('Dict Equality Test', t => {
+	const [a ,b, c] = [1, 2, 3];
+	assert.strictEqual(Dict({a, b, c}), Dict({a, b, c}));
+	assert.strictEqual(Dict({a: 2, b: 1, c: 0}), Dict({a: 2, b: 1, c: 0}));
+	assert.notEqual(Dict({a: 2, b: 1, c: 0}), Dict({a: 2, b: 1, c: 1}));
+	assert.notEqual(Dict({c: 0, b: 1, a: 2}), Dict({a: 2, b: 1, c: 0}));
+	assert.strictEqual(Dict({c: 0, b: 1, a: 2})[size], 3);
+}));
+
+tests.push(test('Dict Property Test', t => {
+	assert.strictEqual(Dict({b: 1, a: 2}).b, 1);
+}));
+
+const [major, minor, patch] = process.versions.node.split('.');
+
+tests.push(test('Symbol Tuple Test', {skip: major < 20 ? 'https://github.com/nodejs/node/issues/49135' : false}, t => {
+	const tuple = Tuple();
+	const symbol = Symbol();
+	const object = {};
+	assert.strictEqual(Tuple( symbol ), Tuple( symbol ));
+	assert.strictEqual(Tuple( symbol, 'aaa' ), Tuple( symbol, 'aaa' ));
+	assert.strictEqual(Tuple( symbol, object ), Tuple( symbol, object ));
+	assert.notEqual(Tuple( Symbol() ), Tuple( Symbol() ));
+	assert.notEqual(Tuple( symbol, 'aaa' ), Tuple( symbol, 'bbb' ));
+	assert.notEqual(Tuple( 'aaa', symbol ), Tuple( symbol, 'aaa' ));
+	assert.notEqual(Tuple( symbol, object ), Tuple( object, symbol ));
+	assert.notEqual(Tuple( symbol, object ), Tuple( symbol, {} ));
+}));
+
+tests.push(test('Iterator Test', t => {
+	const tuple = Tuple(1, 2, 3);
+	for(const v of tuple)
+	{
+		console.log(v);
+	}
+
+	const group = Group(1, 2, 3);
+	for(const v of group)
+	{
+		console.log(v);
+	}
+
+	const record = Record({a:1, b:2, c:3});
+	for(const v of record)
+	{
+		console.log(v);
+	}
+
+	const dict = Dict({a:1, b:2, c:3});
+	for(const v of dict)
+	{
+		console.log(v);
+	}
+}));
+
+test(`Ensure memory isn\'t leaking for scalar keys`, async t => {
+	await Promise.allSettled(tests)
+
+	await new Promise(accept => setTimeout(accept, 1));
+	for (let i = 0; i < 300; i++) {
+		global.gc();
+	}
+
+	await new Promise(accept => setTimeout(accept, 1));
+	for (let i = 0; i < 300; i++) {
+		global.gc();
+	}
+
+	assert.strictEqual(0, Tuple.scalarsCached);
 });
