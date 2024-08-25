@@ -16,7 +16,25 @@ You can install libtuple via `npm`:
 $ npm install libtuple
 ```
 
-You can also import directly via [importmaps](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap):
+#### Usage
+
+Simply import the functions from `libtuple`:
+
+```javascript
+import { Tuple, Group, Record, Dict } from 'libtuple';
+```
+
+You can also import them via URL imports, or [dynamic imports](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import):
+
+```javascript
+import {Tuple, Group, Record, Dict } from 'https://cdn.jsdelivr.net/npm/libtuple@0.0.7-alpha-4/index.mjs';
+```
+
+```javascript
+const { Tuple, Group, Record, Dict } = await import('https://cdn.jsdelivr.net/npm/libtuple/index.mjs');
+```
+
+Alternatively you can add it to your importmap:
 
 ```html
 <script type="importmap">
@@ -26,20 +44,10 @@ You can also import directly via [importmaps](https://developer.mozilla.org/en-U
 	}
 }
 </script>
-```
-
-#### Usage
-
-Simply import the functions from `libtuple`:
-
-```javascript
-import { Tuple, Group, Record, Dict } from 'libtuple';
-```
-
-You can also import them via [dynamic imports](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import):
-
-```javascript
-const { Tuple, Group, Record, Dict } = await import('https://cdn.jsdelivr.net/npm/libtuple/index.mjs');
+<script type="module">
+  import {Tuple, Group, Record, Dict } from 'libtuple';
+  // ...
+</script>
 ```
 
 ### Tuple()
