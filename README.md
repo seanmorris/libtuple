@@ -4,18 +4,42 @@
 
 [![Test](https://github.com/seanmorris/libtuple/actions/workflows/test.yaml/badge.svg)](https://github.com/seanmorris/libtuple/actions/workflows/test.yaml)
 
-### Install with NPM
+### Install & Use
+
+`libtuple` is now ESM compliant!
+
+#### npm:
+
+You can install libtuple via `npm`:
 
 ```bash
 $ npm install libtuple
 ```
 
-## Usage
+You can also import directly via [importmaps](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap):
 
-`libtuple` is now ESM compliant!
+```html
+<script type="importmap">
+{
+	"imports": {
+		"libtuple": "https://cdn.jsdelivr.net/npm/libtuple/index.mjs"
+	}
+}
+</script>
+```
+
+#### Usage
+
+Simply import the functions from `libtuple`:
 
 ```javascript
 import { Tuple, Group, Record, Dict } from 'libtuple';
+```
+
+You can also import them via [dynamic imports](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import):
+
+```javascript
+const { Tuple, Group, Record, Dict } = await import('https://cdn.jsdelivr.net/npm/libtuple/index.mjs');
 ```
 
 ### Tuple()
