@@ -25,7 +25,7 @@ import { Tuple, Group, Record, Dict } from 'libtuple';
 You can also import them via URL imports, or [dynamic imports](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import): *(npm not required)*
 
 ```javascript
-import {Tuple, Group, Record, Dict } from 'https://cdn.jsdelivr.net/npm/libtuple@0.0.7-alpha-4/index.mjs';
+import { Tuple, Group, Record, Dict } from 'https://cdn.jsdelivr.net/npm/libtuple@0.0.7-alpha-4/index.mjs';
 ```
 
 ```javascript
@@ -67,7 +67,7 @@ Group(3, 2, 1) === Group(1, 2, 3); // true
 A `Record()` works the same way, but works with keys & values, and is **not** ordered.
 
 ```javascript
-const [a ,b, c] = [1, 2, 3];
+const [a, b, c] = [1, 2, 3];
 Record({a, b, c}) === Record({c, b, a}); // true
 ```
 
@@ -83,13 +83,17 @@ Dict({a, b, c}) === Dict({c, b, a}); // false
 
 ## Gotchas
 
-Watch out for the following however, object references can be tricky. In this example, each `[]` represents its own, unique object, so the following returns false.
+In JavaScript, object comparisons are based on reference, not on the actual content of the objects. This means that even if two objects have the same properties and values, they are considered different if they do not reference the same memory location.
+
+For example, the following comparison returns false because each [] creates a new, unique array object:
 
 ```javascript
 Tuple( [] ) === Tuple( [] ); // FALSE!!!
 ```
 
-Use the same ***object reference*** to get the same tuple:
+Each [] is a different object in memory, so the tuples containing them are not strictly equal. This is an important behavior to understand when working with tuples that contain objects.
+
+To get the same tuple, you need to use the exact same object reference:
 
 ```javascript
 const a = [];
@@ -117,9 +121,9 @@ You cannot add, remove or modify any property on a tuple.
 ```javascript
 const tuple = Tuple('a', 'b', 'c');
 
-tuple[0] = 'NEW VALUE';
+tuple[0] = 'NEW VALUE'; // This will not change the tuple, it will still be 'a'
 
-console.log( tuple[0] ); // 'a'
+console.log( tuple[0] );
 
 ```
 
