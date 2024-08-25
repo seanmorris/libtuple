@@ -22,7 +22,7 @@ Simply import the functions from `libtuple`:
 import { Tuple, Group, Record, Dict } from 'libtuple';
 ```
 
-You can also import them via URL imports, or [dynamic imports](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import):
+You can also import them via URL imports, or [dynamic imports](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import): *(npm not required)*
 
 ```javascript
 import {Tuple, Group, Record, Dict } from 'https://cdn.jsdelivr.net/npm/libtuple@0.0.7-alpha-4/index.mjs';
