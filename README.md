@@ -157,7 +157,7 @@ Organizing the hierarchy with the scalar prefixes *after* the objects allows us 
 
 ## Limitations
 
-* Registered `Symbol`s cannot participate in `Tuples`. (i.e. created with `Symbol.for()`; [more info](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol#shared_symbols_in_the_global_symbol_registry))
+* Registered `Symbol`s cannot participate in `Tuples`. (i.e. created with `Symbol.for()`; [more info](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol#shared_symbols_in_the_global_symbol_registry)) [⚠️ Node v19 & Earlier](https://github.com/nodejs/node/issues/49135)
 
 ## Testing
 
