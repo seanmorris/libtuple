@@ -107,7 +107,14 @@ export default function Tuple(...args)
 		{
 			const a = (this ? this.args : args);
 			const result = Object.create(this ? this.base : base);
-			Object.assign(result, {...a, [_index]: index++, [size]: Array.isArray(a) ? a.length : Object.keys(a).length, [keys]: this && this.keys});
+			const length = Array.isArray(a) ? a.length : Object.keys(a).length;
+			Object.assign(result, a);
+			Object.defineProperties(result, {
+				length: {value: length},
+				[size]: {value: length},
+				[keys]: {value: this && this.keys},
+				[_index]: {value: index++}
+			});
 			Object.freeze(result);
 
 			if(!scalarMap.has(part))
@@ -126,7 +133,14 @@ export default function Tuple(...args)
 		{
 			const a = (this ? this.args : args);
 			const result = Object.create(this ? this.base : base);
-			Object.assign(result, {...a, [_index]: index++, [size]: Array.isArray(a) ? a.length : Object.keys(a).length, [keys]: this && this.keys});
+			const length = Array.isArray(a) ? a.length : Object.keys(a).length;
+			Object.assign(result, a);
+			Object.defineProperties(result, {
+				length: {value: length},
+				[size]: {value: length},
+				[keys]: {value: this && this.keys},
+				[_index]: {value: index++}
+			});
 			Object.freeze(result);
 
 			map.get(terminator).prefixMap.set(part, result);
@@ -139,7 +153,14 @@ export default function Tuple(...args)
 	{
 		const a = (this ? this.args : args);
 		const result = Object.create(this ? this.base : base);
-		Object.assign(result, {...a, [_index]: index++, [size]: Array.isArray(a) ? a.length : Object.keys(a).length, [keys]: this && this.keys});
+		const length = Array.isArray(a) ? a.length : Object.keys(a).length;
+		Object.assign(result, a);
+		Object.defineProperties(result, {
+			length: {value: length},
+			[size]: {value: length},
+			[keys]: {value: this && this.keys},
+			[_index]: {value: index++}
+		});
 		Object.freeze(result);
 
 		map.get(terminator).result = result;

@@ -107,6 +107,40 @@ console.log( tuple[0] ); // 'a'
 
 ```
 
+### Iterable & Spreadable
+
+Tuples and Groups can be looped over just like Arrays:
+
+```javascript
+const tuple = Tuple(1, 2, 3);
+for(const value of tuple) {
+	console.log(value)
+}
+```
+
+Records, and Dicts can also be iterated just like normal objects:
+
+```javascript
+const record = Record({a: 1, b: 2, c: 3});
+for(const [key, value] of Object.entries(record)) {
+	console.log(key, value);
+}
+```
+
+Tuples & Groups can be spread just like arrays:
+
+```javascript
+const tuple = Tuple(1, 2, 3);
+console.log([...tuple]); // [1, 2, 3]
+```
+
+Similarly, Records & Dicts can be spread into objects:
+
+```javascript
+const record = Record({a: 1, b: 2, c: 3});
+console.log([...record]); // {a: 1, b: 2, c: 3}
+```
+
 ## How It Works
 
 A *tuple* is a type represented by a sequence of values. Unlike arrays, where `[1,2] !== [1,2]`, since, although they hold the same values, the actual object references are different. Tuples give you `Tuple(1,2) === Tuple(1,2)`.

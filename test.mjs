@@ -682,28 +682,16 @@ tests.push(test('Symbol Tuple Test', {skip: major < 20 ? 'https://github.com/nod
 
 tests.push(test('Iterator Test', t => {
 	const tuple = Tuple(1, 2, 3);
-	for(const v of tuple)
-	{
-		console.log(v);
-	}
+	assert.deepEqual([...tuple], [1, 2, 3]);
 
 	const group = Group(1, 2, 3);
-	for(const v of group)
-	{
-		console.log(v);
-	}
+	assert.deepEqual([...group], [1, 2, 3]);
 
 	const record = Record({a:1, b:2, c:3});
-	for(const v of record)
-	{
-		console.log(v);
-	}
+	assert.deepEqual({...record}, {a:1, b:2, c:3});
 
 	const dict = Dict({a:1, b:2, c:3});
-	for(const v of dict)
-	{
-		console.log(v);
-	}
+	assert.deepEqual({...dict}, {a:1, b:2, c:3});
 }));
 
 test(`Ensure memory isn\'t leaking for scalar keys`, async t => {
