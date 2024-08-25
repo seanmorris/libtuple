@@ -2,6 +2,8 @@
 
 *Memory-efficient tuple implementation in 6.4kB*
 
+[![Test](https://github.com/seanmorris/libtuple/actions/workflows/test.yaml/badge.svg)](https://github.com/seanmorris/libtuple/actions/workflows/test.yaml)
+
 ### Install with NPM
 
 ```bash
