@@ -138,7 +138,7 @@ Similarly, Records & Dicts can be spread into objects:
 
 ```javascript
 const record = Record({a: 1, b: 2, c: 3});
-console.log([...record]); // {a: 1, b: 2, c: 3}
+console.log({...record}); // {a: 1, b: 2, c: 3}
 ```
 
 ## How It Works
