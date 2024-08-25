@@ -1,8 +1,6 @@
 # libtuple
 
-*Memory-efficient tuple implementation in 6.4kB*
-
-[![Test](https://github.com/seanmorris/libtuple/actions/workflows/test.yaml/badge.svg)](https://github.com/seanmorris/libtuple/actions/workflows/test.yaml)
+[![Test](https://github.com/seanmorris/libtuple/actions/workflows/test.yaml/badge.svg)](https://github.com/seanmorris/libtuple/actions/workflows/test.yaml) *Memory-efficient tuple implementation in 6.4kB*
 
 ### Install & Use
 
@@ -32,22 +30,6 @@ import {Tuple, Group, Record, Dict } from 'https://cdn.jsdelivr.net/npm/libtuple
 
 ```javascript
 const { Tuple, Group, Record, Dict } = await import('https://cdn.jsdelivr.net/npm/libtuple/index.mjs');
-```
-
-Alternatively you can add it to your importmap:
-
-```html
-<script type="importmap">
-{
-	"imports": {
-		"libtuple": "https://cdn.jsdelivr.net/npm/libtuple/index.mjs"
-	}
-}
-</script>
-<script type="module">
-  import {Tuple, Group, Record, Dict } from 'libtuple';
-  // ...
-</script>
 ```
 
 ### Tuple()
