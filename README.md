@@ -76,7 +76,7 @@ Record({a, b, c}) === Record({c, b, a}); // true
 A `Dict()` is like an ordered `Record()`:
 
 ```javascript
-const [a ,b, c] = [1, 2, 3];
+const [a, b, c] = [1, 2, 3];
 Dict({a, b, c}) === Dict({a, b, c}); // true
 Dict({a, b, c}) === Dict({c, b, a}); // false
 ```
@@ -116,15 +116,14 @@ console.log( Tuple(Tuple(1, 2), Tuple(3, 4)) === Tuple(Tuple(1, 2), Tuple(3, 4))
 
 ### Frozen
 
-You cannot add, remove or modify any property on a tuple.
+Tuples are immutable. Any attempt to modify them will not throw an error, but will silently fail, leaving the original values unchanged.
 
 ```javascript
 const tuple = Tuple('a', 'b', 'c');
 
 tuple[0] = 'NEW VALUE'; // This will not change the tuple, it will still be 'a'
 
-console.log( tuple[0] );
-
+console.log( tuple[0] ); // 'a'
 ```
 
 ### Iterable & Spreadable
@@ -163,7 +162,7 @@ console.log({...record}); // {a: 1, b: 2, c: 3}
 
 ## How It Works
 
-A *tuple* is a type represented by a sequence of values. Unlike arrays, where `[1,2] !== [1,2]`, since, although they hold the same values, the actual object references are different. Tuples give you `Tuple(1,2) === Tuple(1,2)`.
+A *tuple* is a type represented by a sequence of values. Unlike arrays, where `[1, 2] !== [1, 2]` (as they hold different object references), tuples provide a mechanism where `Tuple(1, 2) === Tuple(1, 2)`. This ensures that tuples with the same values are always strictly equal, simplifying equality checks and enhancing memory efficiency.
 
 For a sequence of primitives, this is trivial. Simply run `JSON.stringify` on the list of values and you've got a unique scalar that you can compare against others, and the object-reference problem is gone. Once you add objects to the mix, however, things can get complicated.
 
@@ -187,6 +186,7 @@ Run `npm run test` or `node --test test.mjs` in the terminal.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
+[http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
-http://www.apache.org/licenses/LICENSE-2.0
