@@ -1,6 +1,6 @@
 # libtuple
 
-*Memory-efficient tuple implementation in ~3kB*
+*Memory-efficient tuple implementation in 6.4kB*
 
 ### Install with NPM
 
