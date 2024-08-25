@@ -83,7 +83,7 @@ Dict({a, b, c}) === Dict({c, b, a}); // false
 
 ## Gotchas
 
-Watch out for the following however, object references can be tricky. In this example, each `[]` represents its own, unique object, so the following returns false:
+Watch out for the following however, object references can be tricky. In this example, each `[]` represents its own, unique object, so the following returns false.
 
 ```javascript
 Tuple( [] ) === Tuple( [] ); // FALSE!!!
@@ -103,7 +103,7 @@ Tuple( a ) === Tuple( a ); // true :)
 
 ### Composable
 
-Tuples can be members of of other tuples. This works as expected:
+Tuples can be members of other tuples. This works as expected:
 
 ```javascript
 console.log( Tuple(Tuple(1, 2), Tuple(3, 4)) === Tuple(Tuple(1, 2), Tuple(3, 4)) );
@@ -169,11 +169,11 @@ We could use trees of `WeakMaps` instead, however this case would only allow us 
 
 And that's where prefix-trees come in. Before constructing a tree of `WeakMaps`, the function will group all neighboring scalars into singular values. This will then leave us with a list of objects interspersed by singular scalars. Each scalar is then considered the prefix of the next object. When constructing or traversing the tree, first we come upon a node representing the object, then its prefix, then the next object in the chain. If the first (or any) object has no scalar prefix, we simply move directly to the next object. If the list ends in a scalar, simply add a terminator object reference as a key to the leaf, which holds the actual tuple object.
 
-Organizing the hierarchy with the scalar prefixes *after* the objects allows us to exploit the `WeakMap`'s garbage collection behavior. Once the object keys are GC'ed, so are the entries of the `WeakMap`. Holding a key here does not prevent objects from being GC'ed, so the branches of the internal tuple tree only stay in-memory as long as the objects they're comprised of.
+Organizing the hierarchy with the scalar prefixes *after* the objects allows us to exploit the `WeakMap`'s garbage collection behavior. Once the object keys are GC'ed, so are the entries of the `WeakMap`. Holding a key here does not prevent objects from being GC'ed, so the branches of the internal tuple tree only stay in-memory as long as the objects they contain are in use.
 
 ## Limitations
 
-* Registered `Symbol`s cannot participate in `Tuples`. (i.e. created with `Symbol.for()`; [more info](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol#shared_symbols_in_the_global_symbol_registry)) [⚠️ Node v19 & Earlier](https://github.com/nodejs/node/issues/49135)
+* Registered `Symbol`s cannot be used in `Tuples`. (i.e. created with `Symbol.for()`; [more info](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol#shared_symbols_in_the_global_symbol_registry)) [⚠️ Node v19 & Earlier](https://github.com/nodejs/node/issues/49135)
 
 ## Testing
 
