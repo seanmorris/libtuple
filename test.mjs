@@ -636,11 +636,17 @@ tests.push(test('Group Property Test', t => {
 }));
 
 tests.push(test('Group Equality Test', t => {
+	assert.strictEqual(Group(), Group());
+	assert.strictEqual(Group(1), Group(1));
+	assert.strictEqual(Group(1, 2), Group(2, 1));
 	assert.strictEqual(Group(1, 2, 3), Group(3, 2, 1));
 }));
 
 tests.push(test('Record Equality Test', t => {
 	const [a ,b, c] = [1, 2, 3];
+	assert.strictEqual(Record({}), Record({}));
+	assert.strictEqual(Record({a}), Record({a}));
+	assert.strictEqual(Record({a, b}), Record({b, a}));
 	assert.strictEqual(Record({a, b, c}), Record({c, b, a}));
 	assert.strictEqual(Record({c: 0, b: 1, a: 2}), Record({a: 2, b: 1, c: 0}));
 	assert.strictEqual(Record({c: 0, b: 1, a: 2})[size], 3);
@@ -653,6 +659,9 @@ tests.push(test('Record Property Test', t => {
 
 tests.push(test('Dict Equality Test', t => {
 	const [a ,b, c] = [1, 2, 3];
+	assert.strictEqual(Dict({}), Dict({}));
+	assert.strictEqual(Dict({a}), Dict({a}));
+	assert.strictEqual(Dict({a, b}), Dict({a, b}));
 	assert.strictEqual(Dict({a, b, c}), Dict({a, b, c}));
 	assert.strictEqual(Dict({a: 2, b: 1, c: 0}), Dict({a: 2, b: 1, c: 0}));
 	assert.notEqual(Dict({a: 2, b: 1, c: 0}), Dict({a: 2, b: 1, c: 1}));
