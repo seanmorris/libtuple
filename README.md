@@ -133,7 +133,7 @@ Tuples and Groups can be looped over just like Arrays:
 ```javascript
 const tuple = Tuple(1, 2, 3);
 for(const value of tuple) {
-	console.log(value)
+    console.log(value)
 }
 ```
 
@@ -142,7 +142,7 @@ Records, and Dicts can also be iterated just like normal objects:
 ```javascript
 const record = Record({a: 1, b: 2, c: 3});
 for(const [key, value] of Object.entries(record)) {
-	console.log(key, value);
+    console.log(key, value);
 }
 ```
 
