@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import Tuple from './Tuple.mjs';
-import Group from './Group.mjs';
-import Record from './Record.mjs';
-import Dict from './Dict.mjs';
+import Tuple from '../Tuple.mjs';
+import Group from '../Group.mjs';
+import Record from '../Record.mjs';
+import Dict from '../Dict.mjs';
 
-import { size } from "./Tuple.mjs";
+import { size } from "../Tuple.mjs";
 
 const tests  = [];
 

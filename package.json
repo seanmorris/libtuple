@@ -7,7 +7,7 @@
 	"main": "index.mjs",
 	"keywords":["tuples"],
 	"scripts": {
-		"test": "node --test --expose-gc test.mjs"
+		"test": "node --test --expose-gc test/test.mjs test/schema.test.mjs"
 	},
 	"license": "Apache 2.0",
 	"files": [
