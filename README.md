@@ -308,39 +308,39 @@ The following methods will call `s.string` with additional constraints added:
     ```
 * s.uuidString
     ```javascript
-    const schema = s.uuidString();
-	s.parse(schema, '0ff5d941-f46a-4f4a-aec8-1d1ec117e2a3'); // '0ff5d941-f46a-4f4a-aec8-1d1ec117e2a3'
-    s.parse(schema, '0ff5d941'); // ERROR
+    const uuidSchema = s.uuidString();
+	uuidSchema('0ff5d941-f46a-4f4a-aec8-1d1ec117e2a3'); // '0ff5d941-f46a-4f4a-aec8-1d1ec117e2a3'
+    uuidSchema('0ff5d941'); // ERROR
     ```
 * s.urlString
     ```javascript
-    const schema = s.urlString();
-	s.parse(schema, 'https://example.com'); // 'https://example.com'
-    s.parse(schema, 'not a url'); // ERROR
+    const urlSchema = s.urlString();
+	urlSchema('https://example.com'); // 'https://example.com'
+    urlSchema('not a url'); // ERROR
     ```
 * s.emailString
     ```javascript
-    const schema = s.emailString();
-	s.parse(schema, 'person@example.com'); // 'https://example.com'
-    s.parse(schema, 'not an email'); // ERROR
+    const emailSchema = s.emailString();
+	emailSchema('person@example.com'); // 'https://example.com'
+    emailSchema('not an email'); // ERROR
     ```
 * s.regexString
     ```javascript
-    const schema = s.regexString();
-	s.parse(schema, '.+?'); // 'https://example.com'
-    s.parse(schema, '+++'); // ERROR
+    const regexSchema = s.regexString();
+	regexSchema('.+?'); // 'https://example.com'
+    regexSchema('+++'); // ERROR
     ```
 * s.base64String
     ```javascript
-    const schema = s.base64String();
-    s.parse(schema, 'RXhhbXBsZSBzdHJpbmc='); // 'RXhhbXBsZSBzdHJpbmc=';
-    s.parse(schema, 'notbase64'); // ERROR;
+    const base64Schema = s.base64String();
+    base64Schema('RXhhbXBsZSBzdHJpbmc='); // 'RXhhbXBsZSBzdHJpbmc=';
+    base64Schema('notbase64'); // ERROR;
     ```
 * s.jsonString
     ```javascript
-    const schema = s.jsonString();
-    s.parse(schema, '[0, 1, 2]'); // '[0, 1, 2]';
-    s.parse(schema, 'not json'); // ERROR;
+    const jsonSchema = s.jsonString();
+    jsonSchema('[0, 1, 2]'); // '[0, 1, 2]';
+    jsonSchema('not json'); // ERROR;
     ```
 
 </details>
