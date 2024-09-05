@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import Schema from '../Schema.mjs';
 
-import users from './users.json' with { type: 'json' };
 import Tuple from '../Tuple.mjs';
 
 const s = Schema;
@@ -132,6 +132,8 @@ test('s.or param test', t => {
 });
 
 test('usersSchema test', t => {
+	const users = JSON.parse(fs.readFileSync('test/users.json', {encoding: 'utf-8'}));
+
 	const usersSchema = s.nTuple(
 		(s.sRecord({
 			id: s.number({}),
