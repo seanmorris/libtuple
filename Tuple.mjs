@@ -9,6 +9,9 @@ export const keys = Symbol('keys');
 const base = Object.create(null);
 base.toString = Object.prototype.toString;
 base[Symbol.toStringTag] = 'Tuple';
+base.toJSON = function() {
+	return [...this];
+}
 base[Symbol.iterator] = function() {
 	let index = 0;
 	return { next: () => {

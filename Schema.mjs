@@ -357,6 +357,133 @@ const Schema = {
 	},
 
 	/**
+	 * Validate an integer
+	 * @param {Object} options
+	 * @param {number} options.max Max value
+	 * @param {number} options.min Min value
+	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
+	 * @param {function(any):any} options.map Transform the value after its been validated.
+	 */
+	integer(options = {})
+	{
+		const _options = {...options};
+
+		const checks = [Number.isInteger];
+
+		if(options.check)
+		{
+			checks.push(options.check);
+		}
+
+		_options.check = v => checks.map(c => c(v)).reduce((a, b) => a && b, true);
+
+		return Schema.number(_options);
+	},
+
+	/**
+	 * Validate a float
+	 * @param {Object} options
+	 * @param {number} options.max Max value
+	 * @param {number} options.min Min value
+	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
+	 * @param {function(any):any} options.map Transform the value after its been validated.
+	 */
+	float(options = {})
+	{
+		const _options = {...options};
+
+		const checks = [Number.isFinite];
+
+		if(options.check)
+		{
+			checks.push(options.check);
+		}
+
+		_options.check = v => checks.map(c => c(v)).reduce((a, b) => a && b, true);
+
+		return Schema.number(_options);
+	},
+
+	/**
+	 * Validate a NaN
+	 * @param {Object} options
+	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
+	 * @param {function(any):any} options.map Transform the value after its been validated.
+	 */
+	NaN(options = {})
+	{
+		const _options = {...options};
+
+		const checks = [Number.isNaN];
+
+		if(options.check)
+		{
+			checks.push(options.check);
+		}
+
+		_options.check = v => checks.map(c => c(v)).reduce((a, b) => a && b, true);
+
+		return Schema.number(_options);
+	},
+
+	/**
+	 * Validate an infinite value
+	 * @param {Object} options
+	 * @param {number} options.max Max value
+	 * @param {number} options.min Min value
+	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
+	 * @param {function(any):any} options.map Transform the value after its been validated.
+	 */
+	infinity(options = {})
+	{
+		const checks = [n => !Number.isFinite(n) && !Number.isNaN(n)];
+
+		if(options.check)
+		{
+			checks.push(options.check);
+		}
+
+		const check = v => checks.map(c => c(v)).reduce((a, b) => a && b, true);
+
+		return Schema.number({...options, check});
+	},
+
+	/**
+	 * Validate a bigint
+	 * @param {Object} options
+	 * @param {number} options.max Max value
+	 * @param {number} options.min Min value
+	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
+	 * @param {function(any):any} options.map Transform the value after its been validated.
+	 */
+	bigint(options = {})
+	{
+		return (value, path = '') => {
+			if(typeof value !== 'bigint')
+			{
+				throw new TypeError(`Expected bigint, got ${typeof value} at ${path || 'root'}`);
+			}
+			if(options.check && !options.check(value))
+			{
+				throw new TypeError(`Validation failed! got ${value} at ${path || 'root'}`);
+			}
+			if('max' in options && options.max < value)
+			{
+				throw new TypeError(`Expected max ${options.max}, got ${value} at ${path || 'root'}`);
+			}
+			if('min' in options && options.min > value)
+			{
+				throw new TypeError(`Expected min ${options.min}, got ${value} at ${path || 'root'}`);
+			}
+			if(options.map)
+			{
+				value = options.map(value);
+			}
+			return value;
+		};
+	},
+
+	/**
 	 * Validate a string
 	 * @param {Object} options
 	 * @param {number} options.max Max length
@@ -385,6 +512,18 @@ const Schema = {
 			{
 				throw new TypeError(`Expected min length ${options.min}, got "${value}" at ${path || 'root'}`);
 			}
+			if('prefix' in options && options.prefix !== value.substr(0, options.prefix.length))
+			{
+				throw new TypeError(`Expected prefix ${options.prefix}, got "${value}" at ${path || 'root'}`);
+			}
+			if('suffix' in options && options.suffix !== value.substr(value.length - options.suffix.length))
+			{
+				throw new TypeError(`Expected suffix ${options.suffix}, got "${value}" at ${path || 'root'}`);
+			}
+			if('infix' in options && value.indexOf(options.infix) === -1)
+			{
+				throw new TypeError(`Expected infix ${options.infix}, got "${value}" at ${path || 'root'}`);
+			}
 			if(options.match && !value.match(options.match))
 			{
 				throw new TypeError(`Expected string to match ${options.match}, got "${value}" at ${path || 'root'}`);
@@ -399,6 +538,200 @@ const Schema = {
 			}
 			return value;
 		};
+	},
+
+	/**
+	 * Validate a numeric string
+	 * @param {Object} options
+	 * @param {number} options.max Max value
+	 * @param {number} options.min Min value
+	 * @param {Regex} options.match Throw a TypeError if this does NOT match
+	 * @param {Regex} options.noMatch Throw a TypeError if this DOES match
+	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
+	 * @param {function(any):any} options.map Transform the value after its been validated.
+	 */
+	numericString(options = {})
+	{
+		return (value, path = '') => {
+			if(isNaN(value) || value === null || value != Number(value))
+			{
+				throw new TypeError(`Expected numeric, got "${value}" at ${path || 'root'}`);
+			}
+			if('max' in options && options.max < Number(value))
+			{
+				throw new TypeError(`Expected max ${options.max}, got "${value}" at ${path || 'root'}`);
+			}
+			if('min' in options && options.min > Number(value))
+			{
+				throw new TypeError(`Expected min ${options.min}, got "${value}" at ${path || 'root'}`);
+			}
+
+			const {min, max, ...newOptions} = options;
+
+			return Schema.string(newOptions)(value);
+		};
+	},
+
+	/**
+	 * Validate a date string
+	 * @param {Object} options
+	 * @param {number} options.max Max length
+	 * @param {number} options.min Min length
+	 * @param {Regex} options.match Throw a TypeError if this does NOT match
+	 * @param {Regex} options.noMatch Throw a TypeError if this DOES match
+	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
+	 * @param {function(any):any} options.map Transform the value after its been validated.
+	 */
+	dateString(options = {})
+	{
+		return (value, path = '') => {
+			if(isNaN(Date.parse(value)))
+			{
+				throw new TypeError(`Expected dateString, got "${value}" at ${path || 'root'}`);
+			}
+			if('max' in options && options.max < value)
+			{
+				throw new TypeError(`Expected max ${options.max}, got "${value}" at ${path || 'root'}`);
+			}
+			if('min' in options && options.min > value)
+			{
+				throw new TypeError(`Expected min ${options.min}, got "${value}" at ${path || 'root'}`);
+			}
+
+			const {min, max, ...newOptions} = options;
+
+			return Schema.string(newOptions)(value);
+		};
+	},
+
+	uuidString(options = {})
+	{
+		const checks = [ value =>  String(value).match(/^[a-z,0-9]{8}-[a-z,0-9]{4}-[a-z,0-9]{4}-[a-z,0-9]{4}-[a-z,0-9]{12}$/i) ];
+
+		if(options.check)
+		{
+			checks.push(options.check);
+		}
+
+		const check = v => checks.map(c => c(v)).reduce((a, b) => a && b, true);
+
+		return Schema.string({...options, check});
+	},
+
+	/**
+	 * Validate a url string
+	 * @param {Object} options
+	 * @param {number} options.max Max length
+	 * @param {number} options.min Min length
+	 * @param {Regex} options.match Throw a TypeError if this does NOT match
+	 * @param {Regex} options.noMatch Throw a TypeError if this DOES match
+	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
+	 * @param {function(any):any} options.map Transform the value after its been validated.
+	 */
+	urlString(options = {})
+	{
+		const checks = [ value =>  URL.canParse(value) ];
+
+		if(options.check)
+		{
+			checks.push(options.check);
+		}
+
+		const check = v => checks.map(c => c(v)).reduce((a, b) => a && b, true);
+
+		return Schema.string({...options, check});
+	},
+
+	/**
+	 * Validate a regex string
+	 * @param {Object} options
+	 * @param {number} options.max Max length
+	 * @param {number} options.min Min length
+	 * @param {Regex} options.match Throw a TypeError if this does NOT match
+	 * @param {Regex} options.noMatch Throw a TypeError if this DOES match
+	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
+	 * @param {function(any):any} options.map Transform the value after its been validated.
+	 */
+	emailString(options = {})
+	{
+		const checks = [ value =>  {
+			const atPos = value.indexOf('@');
+			const atPos2 = value.indexOf('@', atPos + 1);
+			const dotPos = value.indexOf('.', atPos);
+
+			return (atPos > 0) && (atPos2 === -1) && (dotPos - atPos > 0) && (value.length - dotPos > 2);
+		} ];
+
+		if(options.check)
+		{
+			checks.push(options.check);
+		}
+
+		const check = v => checks.map(c => c(v)).reduce((a, b) => a && b, true);
+
+		return Schema.string({...options, check});
+	},
+
+	regexString(options = {})
+	{
+		const checks = [ value =>  { try { RegExp(value); return !!value; } catch { return false; } } ];
+
+		if(options.check)
+		{
+			checks.push(options.check);
+		}
+
+		const check = v => checks.map(c => c(v)).reduce((a, b) => a && b, true);
+
+		return Schema.string({...options, check});
+	},
+
+	/**
+	 * Validate a base64 string
+	 * @param {Object} options
+	 * @param {number} options.max Max length
+	 * @param {number} options.min Min length
+	 * @param {Regex} options.match Throw a TypeError if this does NOT match
+	 * @param {Regex} options.noMatch Throw a TypeError if this DOES match
+	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
+	 * @param {function(any):any} options.map Transform the value after its been validated.
+	 */
+	base64String(options = {})
+	{
+		const checks = [ value => value !== '' && value.trim() !== '' && btoa(atob(value)) === value];
+
+		if(options.check)
+		{
+			checks.push(options.check);
+		}
+
+		const check = v => checks.map(c => c(v)).reduce((a, b) => a && b, true);
+
+		return Schema.string({...options, check});
+	},
+
+	/**
+	 * Validate a JSON string
+	 * @param {Object} options
+	 * @param {number} options.max Max length
+	 * @param {number} options.min Min length
+	 * @param {Regex} options.match Throw a TypeError if this does NOT match
+	 * @param {Regex} options.noMatch Throw a TypeError if this DOES match
+	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
+	 * @param {function(any):any} options.map Transform the value after its been validated.
+	 */
+	jsonString(options = {})
+	{
+		const checks = [ value =>  { try { JSON.parse(value); return true; } catch { return false; } } ];
+
+		if(options.check)
+		{
+			checks.push(options.check);
+		}
+
+		const check = v => checks.map(c => c(v)).reduce((a, b) => a && b, true);
+
+		return Schema.string({...options, check});
 	},
 
 	/**
@@ -473,6 +806,26 @@ const Schema = {
 				value = Object.fromEntries(Object.entries(value).map(options.each));
 			}
 			return value;
+		};
+	},
+
+	date(options = {})
+	{
+		return (value, path = '') => {
+			if(!(value instanceof Date))
+			{
+				throw new TypeError(`Expected Date, got "${value}" at ${path || 'root'}`);
+			}
+			if('max' in options && options.max < value)
+			{
+				throw new TypeError(`Expected max ${options.max}, got "${value}" at ${path || 'root'}`);
+			}
+			if('min' in options && options.min > value)
+			{
+				throw new TypeError(`Expected min ${options.min}, got "${value}" at ${path || 'root'}`);
+			}
+
+			return Schema.object({...options, class: Date})(value);
 		};
 	},
 
@@ -573,7 +926,28 @@ const Schema = {
 	 */
 	value(options = {})
 	{
-		return value => {
+		return (value, path = '') => {
+			if(options.map)
+			{
+				value = options.map(value);
+			}
+			return value;
+		};
+	},
+
+	/**
+	 * Match the value to a set of literals with strict-equals comparison.
+	 * @param {...any} literals Value must be strictly equal to one of these.
+	 * @param {function(any):any} options.map Transform the value after its been validated.
+	 * @returns
+	 */
+	oneOf(literals = [], options = {})
+	{
+		return (value, path = '') => {
+			if(!literals.includes(value))
+			{
+				throw new TypeError(`Expected oneOf ${values.join(', ')}, got ${value} at ${path || 'root'}`);
+			}
 			if(options.map)
 			{
 				value = options.map(value);

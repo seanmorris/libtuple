@@ -689,6 +689,19 @@ tests.push(test('Symbol Tuple Test', {skip: major < 20 ? 'https://github.com/nod
 	assert.notEqual(Tuple( symbol, object ), Tuple( symbol, {} ));
 }));
 
+tests.push(test('bigint Tuple Test', t => {
+	const bigZero = 0n;
+	const bigOne = 1n;
+	const bigMillion = 1_000_000n;
+
+	assert.strictEqual(Tuple( bigZero ), Tuple( bigZero ));
+	assert.strictEqual(Tuple( bigZero, bigOne ), Tuple( bigZero, bigOne ));
+	assert.strictEqual(Tuple( bigZero, bigOne, bigMillion ), Tuple( bigZero, bigOne, bigMillion ));
+	assert.strictEqual(Tuple( bigOne ), Tuple( bigOne ));
+	assert.strictEqual(Tuple( bigMillion ), Tuple( bigMillion ));
+	assert.notEqual(Tuple( bigZero ), Tuple( bigOne ));
+}));
+
 tests.push(test('Iterator Test', t => {
 	const tuple = Tuple(1, 2, 3);
 	assert.deepEqual([...tuple], [1, 2, 3]);
@@ -701,6 +714,26 @@ tests.push(test('Iterator Test', t => {
 
 	const dict = Dict({a:1, b:2, c:3});
 	assert.deepEqual({...dict}, {a:1, b:2, c:3});
+}));
+
+tests.push(test('Tuple JSON Test', t => {
+	const t1 = Tuple(1, 2, 3);
+	assert.strictEqual(JSON.stringify(t1), '[1,2,3]');
+}));
+
+tests.push(test('Group JSON Test', t => {
+	const g1 = Group(1, 2, 3);
+	assert.strictEqual(JSON.stringify(g1), '[1,2,3]');
+}));
+
+tests.push(test('Record JSON Test', t => {
+	const r1 = Record({id: 1, name: 'Test'});
+	assert.strictEqual(JSON.stringify(r1), '{"id":1,"name":"Test"}');
+}));
+
+tests.push(test('Dict JSON Test', t => {
+	const d1 = Dict({id: 1, name: 'Test'});
+	assert.strictEqual(JSON.stringify(d1), '{"id":1,"name":"Test"}');
 }));
 
 test(`Ensure memory isn\'t leaking for scalar keys`, async t => {

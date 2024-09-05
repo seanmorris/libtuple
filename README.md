@@ -14,6 +14,65 @@ You can install libtuple via `npm`:
 $ npm install libtuple
 ```
 
+## Tuples are...
+
+*(Groups, Records, and Dicts are just specialized Tuples)*
+
+### Immutable
+
+Tuples are immutable. Any attempt to modify them will not throw an error, but will silently fail, leaving the original values unchanged.
+
+```javascript
+const tuple = Tuple('a', 'b', 'c');
+
+tuple[0] = 'NEW VALUE'; // This will not change the tuple, it will still be 'a'
+
+console.log( tuple[0] ); // 'a'
+```
+
+### Composable
+
+Tuples can be members of other tuples. This works as expected:
+
+```javascript
+console.log( Tuple(Tuple(1, 2), Tuple(3, 4)) === Tuple(Tuple(1, 2), Tuple(3, 4)) );
+// true
+```
+
+### Iterable & Spreadable
+
+Tuples and Groups can be looped over just like Arrays:
+
+```javascript
+const tuple = Tuple(1, 2, 3);
+for(const value of tuple) {
+    console.log(value)
+}
+```
+
+Records, and Dicts can also be iterated just like normal objects:
+
+```javascript
+const record = Record({a: 1, b: 2, c: 3});
+for(const [key, value] of Object.entries(record)) {
+    console.log(key, value);
+}
+```
+
+Tuples & Groups can be spread just like arrays:
+
+```javascript
+const tuple = Tuple(1, 2, 3);
+console.log([...tuple]); // [1, 2, 3]
+```
+
+Similarly, Records & Dicts can be spread into objects:
+
+```javascript
+const record = Record({a: 1, b: 2, c: 3});
+console.log({...record}); // {a: 1, b: 2, c: 3}
+```
+
 #### Usage
 
 Simply import the functions from `libtuple`:
@@ -86,7 +145,7 @@ Dict({a, b, c}) === Dict({c, b, a}); // false
 A `Schema` allows you to define a complex structure for your immutables. It is defined by one or more SchemaMappers, which take a value and either return it, or throw an error:
 
 ```javascript
-import { Schema } from 'libtuple';
+import { Schema as s } from 'libtuple';
 
 const boolSchema = s.boolean();
 
@@ -98,6 +157,8 @@ boolSchema(123);   // throws an error
 You can create schemas for Tuples, Groups, Records, and Dicts:
 
 ```javascript
+import { Schema as s } from 'libtuple';
+
 const userSchema = s.record({
     id: s.number(),
     email: s.string(),
@@ -115,18 +176,53 @@ const userListSchema = s.nTuple(userSchema);
 
 const userListTuple = userListSchema(users);
 ```
-##### Schema.boolean(options)
+
+`Schema.parse()` will return the parsed value, or NaN on error, since `NaN !== NaN`.
+
+```javascript
+import { Schema as s } from 'libtuple';
+
+const boolSchema = s.boolean();
+
+s.parse(boolSchema, true);  // returns true
+s.parse(boolSchema, false); // returns false
+s.parse(boolSchema, 123);   // returns NaN
+```
+### SchemaMappers
+
+*Expand the sections below to see SchemaMapper documentation.*
+
+<details>
+  <summary>Schema Mappers for Values</summary>
+
+#### Schema.value(options)
+
+* options.map - Callback to transform the value after its been validated.
+* options.check - Throw a TypeError if this returns false.
+
+#### Schema.drop()
+
+Drop the value (always maps to `undefined`)
+
+#### Schema.boolean(options)
 
 * options.map - Callback to transform the value after its been validated.
 
-##### Schema.number(options)
+#### Schema.number(options)
 
 * options.min - Min value
 * options.max - Max value
 * options.map - Callback to transform the value after its been validated.
 * options.check - Throw a TypeError if this returns false.
 
-##### Schema.string(options)
+#### Schema.bigint(options)
+
+* options.min - Min value
+* options.max - Max value
+* options.map - Callback to transform the value after its been validated.
+* options.check - Throw a TypeError if this returns false.
+
+#### Schema.string(options)
 
 * options.min - Min length
 * options.max - Max length
@@ -135,7 +231,7 @@ const userListTuple = userListSchema(users);
 * options.noMatch - Throw a TypeError if this DOES match
 * options.check - Throw a TypeError if this returns false.
 
-##### Schema.array(options)
+#### Schema.array(options)
 
 * options.min - Min length
 * options.max - Max length
@@ -143,41 +239,83 @@ const userListTuple = userListSchema(users);
 * options.each - Callback to transform each element.
 * options.check - Throw a TypeError if this returns false.
 
-##### Schema.object(options)
+#### Schema.object(options)
 
 * options.class - Throw a TypeError if the class does not match.
 * options.map - Callback to transform the value after its been validated.
 * options.each - Callback to transform each element.
 * options.check - Throw a TypeError if this returns false.
 
-##### Schema.function(options)
+#### Schema.function(options)
 
 * options.map - Callback to transform the value after its been validated.
 * options.check - Throw a TypeError if this returns false.
 
-##### Schema.symbol(options)
+#### Schema.symbol(options)
 
 * options.map - Callback to transform the value after its been validated.
 * options.check - Throw a TypeError if this returns false.
 
-##### Schema.null(options)
+#### Schema.null(options)
 
 * options.map - Callback to transform the value after its been validated.
 
-##### Schema.undefined(options)
+#### Schema.undefined(options)
 
 * options.map - Callback to transform the value after its been validated.
 
-##### Schema.value(options)
+---
+</details>
 
-* options.map - Callback to transform the value after its been validated.
-* options.check - Throw a TypeError if this returns false.
+<details>
+  <summary>Schema Mappers for Convenience</summary>
 
-##### Schema.drop()
+#### Convenience methods for numbers
 
-Drop the value (always maps to `undefined`)
+The following methods will call `s.number` with additional constraints added:
 
-##### Schema.or()
+* s.integer
+* s.float
+* s.NaN
+* s.infinity
+
+#### Convenience methods for strings
+
+The following methods will call `s.string` with additional constraints added:
+
+* s.numericString
+    ```javascript
+    // options.min & options.max are overridden for numeric comparison.
+    const positive = s.numericString({map: Number, min: Number.EPSILON});
+	const negative = s.numericString({map: Number, max: -Number.EPSILON});
+
+    negative('-100'); // -100
+    positive('100');  //  100
+
+    negative('5');    // ERROR
+    positive('-5');   // ERROR
+    ```
+* s.dateString
+    ```javascript
+    // options.min & options.max are overridden for comparison with Date objects.
+    const after1994 = s.dateString({min: new Date('01/01/1995')});
+
+    after1994('07/04/1995'); // '01/01/1996'
+    after1994('07/04/1989'); // ERROR
+    ```
+* s.uuidString
+* s.urlString
+* s.emailString
+* s.regexString
+* s.base64String
+* s.jsonString
+
+</details>
+
+<details>
+  <summary>Special Schema Mappers</summary>
+
+#### Schema.or(...schemaMappers)
 
 Map the value with the first matching SchemaMapper
 
@@ -185,19 +323,47 @@ Map the value with the first matching SchemaMapper
 import { Schema as s } from 'libtuple';
 
 const dateSchema = s.or(
-    s.string({match: /\d\d \w+ \d\d\d\d \d\d:\d\d:\d\d \w+?/, map: s => new Date(s)})
-    , s.object({class: Date})
+    s.string({match: /\d\d \w+ \d\d\d\d \d\d:\d\d:\d\d \w+?/, map: s => new Date(s)}),
+    s.object({class: Date})
 );
 
 console.log( dateSchema('04 Apr 1995 00:12:00 GMT') );
 console.log( dateSchema(new Date) );
 ```
 
-##### Schema.repeat(, schemaMapper)
+#### Schema.repeat(r, schemaMapper)
 
-Repeat a SchemaMapper n times
+Repeat a SchemaMapper r times
 
-##### Schema.tuple(...values)
+```javascript
+import { Schema as s } from 'libtuple';
+
+const pointSchema = s.tuple(s.repeat(2, s.number()));
+
+const point = pointSchema([5, 10]);
+```
+
+#### Schema.oneOf(literals = [], options = {})
+
+Match the value to a set of literals with strict-equals comparison.
+
+```javascript
+import { Schema as s } from 'libtuple';
+
+const schema = s.oneOf(['something', 1234]);
+
+s.parse(schema, 1234);          // 1234
+s.parse(schema, 'something');   // 'something'
+s.parse(schema, 'not on list'); // ERROR!
+```
+
+---
+</details>
+
+<details>
+  <summary>Schema Mappers for Tuples, Groups, Records and Dicts</summary>
+
+#### Schema.tuple(...values)
 
 Map one or more values to a Tuple.
 
@@ -209,11 +375,11 @@ const pointSchema = s.tuple(s.number(), s.number());
 const point = pointSchema([5, 10]);
 ```
 
-##### Schema.group(...values)
+#### Schema.group(...values)
 
 Map one or more values to a Group.
 
-##### Schema.record(properties)
+#### Schema.record(properties)
 
 Map one or more properties to a Record.
 
@@ -231,19 +397,19 @@ const company = companySchema({
 });
 ```
 
-##### Schema.dict(properties)
+#### Schema.dict(properties)
 
 Map one or more values to a Dict.
 
-##### Schema.nTuple()
+#### Schema.nTuple(...values)
 
 Map n values to a Tuple. Will append each value in the input to the Tuple using the same mapper.
 
-##### Schema.nGroup()
+#### Schema.nGroup(...values)
 
 Map n values to a Group. Will append each value in the input to the Group using the same mapper.
 
-##### Schema.nRecord()
+#### Schema.nRecord(properties)
 
 Map n properties to a Record. Will append additional properties without mapping or validation, if present.
 
@@ -262,11 +428,11 @@ const company = companySchema({
 });
 ```
 
-##### Schema.nDict()
+#### Schema.nDict(properties)
 
 Map n properties to a Dict. Will append additional properties without mapping or validation, if present.
 
-##### Schema.sTuple()
+#### Schema.sTuple(...values)
 
 Strictly map values to a Tuple. Will throw an error if the number of values does not match.
 
@@ -279,26 +445,26 @@ const pointA = pointSchema([5, 10]);
 const pointB = pointSchema([5, 10, 1]); // ERROR!
 ```
 
-##### Schema.sGroup()
+#### Schema.sGroup(...values)
 
 Strictly map values to a Group. Will throw an error if the number of values does not match.
 
-##### Schema.sRecord()
+#### Schema.sRecord(properties)
 
 Strictly map values to a Record. Will throw an error if the number of values does not match.
 
-##### Schema.sDict()
+#### Schema.sDict(properties)
 
 Strictly map values to a Dict. Will throw an error if the number of values does not match.
 
-##### Schema.xTuple()
+#### Schema.xTuple(...values)
 
 Exclusively map values to a Tuple. Will drop any keys not present in the schema.
 
 ```javascript
 import { Schema as s } from 'libtuple';
 
-const pointSchema = s.sTuple(s.number(), s.number());
+const pointSchema = s.xTuple(s.number(), s.number());
 
 const pointA = pointSchema([5, 10]); // [5, 10]
 const pointB = pointSchema([5, 10, 1]); // Also [5, 10]
@@ -306,95 +472,39 @@ const pointB = pointSchema([5, 10, 1]); // Also [5, 10]
 console.log(pointB[2]); //undefined
 ```
 
-##### Schema.xGroup()
+#### Schema.xGroup(...values)
 
 Exclusively map values to a Group. Will drop any keys not present in the schema.
 
-##### Schema.xRecord()
+#### Schema.xRecord(properties)
 
 Exclusively map values to a Record. Will drop any keys not present in the schema.
 
-##### Schema.xDict()
+#### Schema.xDict(properties)
 
 Exclusively map values to a Dict. Will drop any keys not present in the schema.
+
+---
+</details>
 
 ## Gotchas
 
 In JavaScript, object comparisons are based on reference, not on the actual content of the objects. This means that even if two objects have the same properties and values, they are considered different if they do not reference the same memory location.
 
-For example, the following comparison returns false because each [] creates a new, unique array object:
+For example, the following comparison returns false because each {} creates a new, unique object:
 
 ```javascript
-Tuple( [] ) === Tuple( [] ); // FALSE!!!
+Tuple( {} ) === Tuple( {} ); // FALSE!!!
 ```
 
-Each [] is a different object in memory, so the tuples containing them are not strictly equal. This is an important behavior to understand when working with tuples that contain objects.
+Each {} is a different object in memory, so the tuples containing them are not strictly equal. This is an important behavior to understand when working with tuples that contain objects.
 
 To get the same tuple, you need to use the exact same object reference:
 
 ```javascript
-const a = [];
+const a = {};
 
 Tuple( a ) === Tuple( a ); // true :)
-```
-
-## Tuples are...
-
-*(Groups, Records, and Dicts are just specialized Tuples)*
-
-### Composable
-
-Tuples can be members of other tuples. This works as expected:
-
-```javascript
-console.log( Tuple(Tuple(1, 2), Tuple(3, 4)) === Tuple(Tuple(1, 2), Tuple(3, 4)) );
-// true
-```
-
-### Frozen
-
-Tuples are immutable. Any attempt to modify them will not throw an error, but will silently fail, leaving the original values unchanged.
-
-```javascript
-const tuple = Tuple('a', 'b', 'c');
-
-tuple[0] = 'NEW VALUE'; // This will not change the tuple, it will still be 'a'
-
-console.log( tuple[0] ); // 'a'
-```
-
-### Iterable & Spreadable
-
-Tuples and Groups can be looped over just like Arrays:
-
-```javascript
-const tuple = Tuple(1, 2, 3);
-for(const value of tuple) {
-    console.log(value)
-}
-```
-
-Records, and Dicts can also be iterated just like normal objects:
-
-```javascript
-const record = Record({a: 1, b: 2, c: 3});
-for(const [key, value] of Object.entries(record)) {
-    console.log(key, value);
-}
-```
-
-Tuples & Groups can be spread just like arrays:
-
-```javascript
-const tuple = Tuple(1, 2, 3);
-console.log([...tuple]); // [1, 2, 3]
-```
-
-Similarly, Records & Dicts can be spread into objects:
-
-```javascript
-const record = Record({a: 1, b: 2, c: 3});
-console.log({...record}); // {a: 1, b: 2, c: 3}
 ```
 
 ## How It Works

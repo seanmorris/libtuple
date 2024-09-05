@@ -4,6 +4,9 @@ import { _index, size } from "./Tuple.mjs";
 const base = Object.create(null);
 base.toString = Object.prototype.toString;
 base[Symbol.toStringTag] = 'Group';
+base.toJSON = function() {
+	return [...this];
+};
 base[Symbol.iterator] = function() {
 	let index = 0;
 	return { next: () => {
