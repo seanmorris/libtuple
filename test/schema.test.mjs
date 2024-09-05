@@ -103,6 +103,34 @@ test('dateSchema test', t => {
 	assert.throws(() => dateSchema(new Event('something')), 'SchemaMapper should throw errors on bad value.');
 });
 
+test('s.or test', t => {
+	const schema = s.or(s.boolean(), s.string());
+	assert.strictEqual(s.parse(schema, false), false);
+	assert.strictEqual(s.parse(schema, true), true);
+
+	assert.strictEqual(s.parse(schema, ""), "");
+	assert.strictEqual(s.parse(schema, "string"), "string");
+
+	assert.throws(() => schema(321), 'SchemaMapper should throw errors on bad value.');
+	assert.throws(() => schema({}), 'SchemaMapper should throw errors on bad value.');
+});
+
+test('s.or param test', t => {
+	const schema = s.or(
+		s.string({match: /\d\d \w+ \d\d\d\d \d\d:\d\d:\d\d \w+?/})
+		, s.object({class: Date})
+	);
+
+	const dateObject = new Date;
+	const dateString = '04 Apr 1995 00:12:00 GMT';
+
+	assert.strictEqual(s.parse(schema, dateObject), dateObject);
+	assert.strictEqual(s.parse(schema, dateString), dateString);
+
+	assert.throws(() => schema([]), 'SchemaMapper should throw errors on bad value.');
+	assert.throws(() => schema("bad string"), 'SchemaMapper should throw errors on bad value.');
+});
+
 test('usersSchema test', t => {
 	const usersSchema = s.sTuple(
 		...s.repeat(10, s.sRecord({
@@ -118,8 +146,8 @@ test('usersSchema test', t => {
 				city: s.string(),
 				zipcode: s.string({match: /\d{5}(-\d{4})?/, map: s => Tuple(...s.split('-'))}),
 				geo: s.sRecord({
-					lat: s.value({map: Number}),
-					lng: s.value({map: Number}),
+					lat: s.string({map: Number}),
+					lng: s.string({map: Number}),
 				}),
 			}),
 			phone: s.string({map: s => Tuple(...s.split(/\W+/).filter(x => x))}),
@@ -132,10 +160,12 @@ test('usersSchema test', t => {
 		}))
 	);
 
-	const usersA = usersSchema(users);
-	const usersB = usersSchema(users);
+	const usersA = usersSchema(JSON.parse(JSON.stringify(users)));
+	const usersB = usersSchema(JSON.parse(JSON.stringify(users)));
 
 	assert.strictEqual(usersA, usersB);
 	assert.strictEqual(usersA[0], usersB[0]);
 	assert.strictEqual(usersA[9], usersB[9]);
+
+	assert.notEqual(usersA[0], usersB[1]);
 });

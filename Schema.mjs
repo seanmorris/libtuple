@@ -26,7 +26,7 @@ import Dict from './Dict.mjs';
 const Schema = {
 	/**
 	 * Map one or more values to a Tuple.
-	 * Will append additional properties as plain values if more values are provided than appear in the schema.
+	 * Will append additional properties as unmapped values if more values are provided than appear in the schema.
 	 * @param {...SchemaMapper} schema A list of SchemaMappers
 	 */
 	tuple(...schema)
@@ -40,7 +40,7 @@ const Schema = {
 
 	/**
 	 * Map one or more values to a Group.
-	 * Will append additional properties as plain values if more values are provided than appear in the schema.
+	 * Will append additional properties as unmapped values if more values are provided than appear in the schema.
 	 * @param {...SchemaMapper} schema A list of SchemaMappers
 	 */
 	group(...schema)
@@ -54,6 +54,7 @@ const Schema = {
 
 	/**
 	 * Map an object to a Record.
+	 * Will append additional properties as unmapped values if more values are provided than appear in the schema.
 	 * @param {Object.<string, SchemaMapper>} schema - An Object holding SchemaMappers
 	 */
 	record(schema = {})
@@ -68,6 +69,7 @@ const Schema = {
 
 	/**
 	 * Map an object to a Record.
+	 * Will append additional properties as unmapped values if more values are provided than appear in the schema.
 	 * @param {Object.<string, SchemaMapper>} schema - An Object holding SchemaMappers
 	 */
 	dict(schema = {})
@@ -82,7 +84,7 @@ const Schema = {
 
 	/**
 	 * Map n values to a Tuple.
-	 * Will append each value in the input to the Tuple
+	 * Will append each value in the input to the Tuple using the same mapper.
 	 * @param {SchemaMapper} schema - A SchemaMapper
 	 */
 	nTuple(schema)
@@ -99,7 +101,7 @@ const Schema = {
 
 	/**
 	 * Map n values to a Group.
-	 * Will append each value in the input to the Group
+	 * Will append each value in the input to the Group using the same mapper.
 	 * @param {SchemaMapper} schema - A list of SchemaMappers
 	 */
 	nGroup(schema)
@@ -116,6 +118,7 @@ const Schema = {
 
 	/**
 	 * Map n keys to a Record.
+	 * Will append each value in the input to the Record using the same mapper.
 	 * @param {Object.<string, SchemaMapper>} schema - An Object holding SchemaMappers
 	 */
 	nRecord(schema)
@@ -130,6 +133,7 @@ const Schema = {
 
 	/**
 	 * Map n keys to a Dict.
+	 * Will append each value in the input to the Dict using the same mapper.
 	 * @param {Object.<string, SchemaMapper>} schema - An Object holding SchemaMappers
 	 */
 	nDict(schema)
@@ -444,7 +448,7 @@ const Schema = {
 	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
 	 * @param {function(any):class} options.class Throw a TypeError if the class does not match.
 	 * @param {function(any):any} options.map Transform the object after its been validated.
-	 * @param {function(any):each} options.each Transform each entry in the object, after its been validated..
+	 * @param {function(any):each} options.each Transform each entry in the object, after its been validated.
 	 */
 	object(options = {})
 	{
@@ -580,11 +584,37 @@ const Schema = {
 	},
 
 	/**
-	 * Drop the value
+	 * Drop the value (always maps to `undefined`)
 	 */
 	drop()
 	{
 		return () => undefined;
+	},
+
+	/**
+	 * Map the value with the first matching SchemaMapper
+	 * @param  {...function(options):value} mappers
+	 */
+	or(...mappers)
+	{
+		return (value, path) => {
+			const errors = [];
+			for(const mapper of mappers)
+			{
+				try
+				{
+					return mapper(value, path);
+				}
+				catch(error)
+				{
+					errors.push(error);
+				}
+			}
+
+			const multi = new Error(errors.map(e => e.message).join(", "));
+			multi.errors = errors;
+			throw multi;
+		};
 	},
 
 	/**
