@@ -307,11 +307,41 @@ The following methods will call `s.string` with additional constraints added:
     after1994('07/04/1989'); // ERROR
     ```
 * s.uuidString
+    ```javascript
+    const schema = s.uuidString();
+	s.parse(schema, '0ff5d941-f46a-4f4a-aec8-1d1ec117e2a3'); // '0ff5d941-f46a-4f4a-aec8-1d1ec117e2a3'
+    s.parse(schema, '0ff5d941'); // ERROR
+    ```
 * s.urlString
+    ```javascript
+    const schema = s.urlString();
+	s.parse(schema, 'https://example.com'); // 'https://example.com'
+    s.parse(schema, 'not a url'); // ERROR
+    ```
 * s.emailString
+    ```javascript
+    const schema = s.emailString();
+	s.parse(schema, 'person@example.com'); // 'https://example.com'
+    s.parse(schema, 'not an email'); // ERROR
+    ```
 * s.regexString
+    ```javascript
+    const schema = s.emailString();
+	s.parse(schema, '.+?'); // 'https://example.com'
+    s.parse(schema, '+++'); // ERROR
+    ```
 * s.base64String
+    ```javascript
+    const schema = s.base64String();
+    s.parse(schema, 'RXhhbXBsZSBzdHJpbmc='); // 'RXhhbXBsZSBzdHJpbmc=';
+    s.parse(schema, 'notbase64'); // ERROR;
+    ```
 * s.jsonString
+    ```javascript
+    const schema = s.jsonString();
+    s.parse(schema, '[0, 1, 2]'); // '[0, 1, 2]';
+    s.parse(schema, 'not json'); // ERROR;
+    ```
 
 </details>
 
