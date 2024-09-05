@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import Schema from '../Schema.mjs';
 
-import users from './users.json' assert { type: 'json' };
+import users from './users.json' with { type: 'json' };
 import Tuple from '../Tuple.mjs';
 
 const s = Schema;

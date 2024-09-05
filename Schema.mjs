@@ -236,7 +236,7 @@ const Schema = {
 	},
 
 	/**
-	 * Exclusively map values to a Record.
+	 * Exclusively map values to a Tuple.
 	 * Will drop any keys not present in the schema.
 	 * @param {...SchemaMapper} schema A list of SchemaMappers
 	 */
