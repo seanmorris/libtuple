@@ -159,25 +159,28 @@ You can create schemas for Tuples, Groups, Records, and Dicts:
 ```javascript
 import { Schema as s } from 'libtuple';
 
+const pointSchema = s.tuple(
+    s.number(),
+    s.number(),
+);
+
+const pointTuple = pointSchema([5, 10]);
+
+console.log(pointTuple);
+
 const userSchema = s.record({
     id: s.number(),
     email: s.string(),
 });
 
-const users = [
-    {id: 1, email: "fake@example.com"},
-    {id: 2, email: "another@example.com"},
-    {id: 3, email: "and_a_third@example.com"},
-]
+const userRecord = userSchema({id: 1, email: "fake@example.com"});
 
-const userRecord = userSchema(users[0]);
-
-const userListSchema = s.nTuple(userSchema);
-
-const userListTuple = userListSchema(users);
+console.log(userRecord);
 ```
 
-`Schema.parse()` will return the parsed value, or NaN on error, since `NaN !== NaN`.
+#### Schema.parse(schema, value)
+
+`Schema.parse()` will return the parsed value, or NaN on error, since `NaN` is falsey, and `NaN !== NaN`.
 
 ```javascript
 import { Schema as s } from 'libtuple';
@@ -384,6 +387,8 @@ Map one or more values to a Group.
 Map one or more properties to a Record.
 
 ```javascript
+import { Schema as s } from 'libtuple';
+
 const companySchema = s.sDict({
     name: s.string(),
     phone: s.string(),
@@ -414,6 +419,8 @@ Map n values to a Group. Will append each value in the input to the Group using 
 Map n properties to a Record. Will append additional properties without mapping or validation, if present.
 
 ```javascript
+import { Schema as s } from 'libtuple';
+
 const companySchema = s.sDict({
     name: s.string(),
     phone: s.string(),
@@ -462,14 +469,17 @@ Strictly map values to a Dict. Will throw an error if the number of values does 
 Exclusively map values to a Tuple. Will drop any keys not present in the schema.
 
 ```javascript
-import { Schema as s } from 'libtuple';
+import { Schema as s } from './index.mjs';
 
 const pointSchema = s.xTuple(s.number(), s.number());
 
 const pointA = pointSchema([5, 10]); // [5, 10]
 const pointB = pointSchema([5, 10, 1]); // Also [5, 10]
 
-console.log(pointB[2]); //undefined
+console.log(pointB[0]); // 5
+console.log(pointB[1]); // 10
+console.log(pointB[2]); // undefined
+
 ```
 
 #### Schema.xGroup(...values)
