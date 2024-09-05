@@ -326,7 +326,7 @@ The following methods will call `s.string` with additional constraints added:
     ```
 * s.regexString
     ```javascript
-    const schema = s.emailString();
+    const schema = s.regexString();
 	s.parse(schema, '.+?'); // 'https://example.com'
     s.parse(schema, '+++'); // ERROR
     ```
