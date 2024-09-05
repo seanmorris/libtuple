@@ -389,7 +389,7 @@ Map one or more properties to a Record.
 ```javascript
 import { Schema as s } from 'libtuple';
 
-const companySchema = s.sDict({
+const companySchema = s.sRecord({
     name: s.string(),
     phone: s.string(),
     address: s.string(),
@@ -400,23 +400,13 @@ const company = companySchema({
     phone: '+1-000-555-1234',
     address: '123 Fake St, Anytown, USA',
 });
+
+console.log({company});
 ```
 
 #### Schema.dict(properties)
 
 Map one or more values to a Dict.
-
-#### Schema.nTuple(...values)
-
-Map n values to a Tuple. Will append each value in the input to the Tuple using the same mapper.
-
-#### Schema.nGroup(...values)
-
-Map n values to a Group. Will append each value in the input to the Group using the same mapper.
-
-#### Schema.nRecord(properties)
-
-Map n properties to a Record. Will append additional properties without mapping or validation, if present.
 
 ```javascript
 import { Schema as s } from 'libtuple';
@@ -431,7 +421,50 @@ const company = companySchema({
     name: 'Acme Corporation',
     phone: '+1-000-555-1234',
     address: '123 Fake St, Anytown, USA',
+});
+
+console.log({company});
+```
+
+#### Schema.nTuple(...values)
+
+Map n values to a Tuple. Will append each value in the input to the Tuple using the same mapper.
+
+```javascript
+import { Schema as s } from 'libtuple';
+
+const vectorSchema = s.nTuple(s.number());
+
+const vec2 = vectorSchema([5, 10]);
+const vec3 = vectorSchema([5, 10, 11]);
+const vec4 = vectorSchema([5, 10, 11, 17]);
+
+console.log({vec2, vec3, vec4});
+```
+
+#### Schema.nGroup(...values)
+
+Map n values to a Group. Will append each value in the input to the Group using the same mapper.
+
+#### Schema.nRecord(properties)
+
+Map n properties to a Record. Will append additional properties without mapping or validation, if present.
+
+```javascript
+import { Schema as s } from 'libtuple';
+
+const companySchema = s.nRecord({
+    name: s.string(),
+    phone: s.string(),
+    address: s.string(),
+});
+
+const company = companySchema({
+    name: 'Acme Corporation',
+    phone: '+1-000-555-1234',
+    address: '123 Fake St, Anytown, USA',
     openHours: "9AM-7PM",
+    slogan: "We do business.",
 });
 ```
 
@@ -460,6 +493,31 @@ Strictly map values to a Group. Will throw an error if the number of values does
 
 Strictly map values to a Record. Will throw an error if the number of values does not match.
 
+```javascript
+import { Schema as s } from 'libtuple';
+
+const companySchema = s.nRecord({
+    name: s.string(),
+    phone: s.string(),
+    address: s.string(),
+});
+
+const company = companySchema({
+    name: 'Acme Corporation',
+    phone: '+1-000-555-1234',
+    address: '123 Fake St, Anytown, USA',
+});
+
+// ERROR!
+companySchema({
+    name: 'Acme Corporation',
+    phone: '+1-000-555-1234',
+    address: '123 Fake St, Anytown, USA',
+    openHours: "9AM-7PM",
+    slogan: "We do business.",
+});
+```
+
 #### Schema.sDict(properties)
 
 Strictly map values to a Dict. Will throw an error if the number of values does not match.
@@ -487,6 +545,24 @@ console.log(pointB[2]); // undefined
 Exclusively map values to a Group. Will drop any keys not present in the schema.
 
 #### Schema.xRecord(properties)
+
+```javascript
+const companySchema = s.xRecord({
+    name: s.string(),
+    phone: s.string(),
+    address: s.string(),
+});
+
+const company = companySchema({
+    name: 'Acme Corporation',
+    phone: '+1-000-555-1234',
+    address: '123 Fake St, Anytown, USA',
+    openHours: "9AM-7PM",
+    slogan: "We do business.",
+});
+
+console.log({company});
+```
 
 Exclusively map values to a Record. Will drop any keys not present in the schema.
 
