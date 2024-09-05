@@ -118,7 +118,6 @@ const Schema = {
 
 	/**
 	 * Map n keys to a Record.
-	 * Will append each value in the input to the Record using the same mapper.
 	 * @param {Object.<string, SchemaMapper>} schema - An Object holding SchemaMappers
 	 */
 	nRecord(schema)
@@ -133,7 +132,6 @@ const Schema = {
 
 	/**
 	 * Map n keys to a Dict.
-	 * Will append each value in the input to the Dict using the same mapper.
 	 * @param {Object.<string, SchemaMapper>} schema - An Object holding SchemaMappers
 	 */
 	nDict(schema)
@@ -305,7 +303,8 @@ const Schema = {
 
 	/**
 	 * Validate a boolean
-	 * @param {*} options
+	 * @param {Object} options
+	 * @param {function(any):any} options.map Transform the value after its been validated.
 	 */
 	boolean(options = {})
 	{

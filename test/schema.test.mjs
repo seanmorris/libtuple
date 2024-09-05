@@ -132,8 +132,8 @@ test('s.or param test', t => {
 });
 
 test('usersSchema test', t => {
-	const usersSchema = s.sTuple(
-		...s.repeat(10, s.sRecord({
+	const usersSchema = s.nTuple(
+		(s.sRecord({
 			id: s.number({}),
 			name: s.string({
 				map: s => Tuple(...s.split(' '))

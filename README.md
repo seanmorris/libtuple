@@ -1,6 +1,6 @@
 # libtuple
 
-[![Test](https://github.com/seanmorris/libtuple/actions/workflows/test.yaml/badge.svg)](https://github.com/seanmorris/libtuple/actions/workflows/test.yaml) *Memory-efficient tuple implementation in 6.4kB*
+[![Test](https://github.com/seanmorris/libtuple/actions/workflows/test.yaml/badge.svg)](https://github.com/seanmorris/libtuple/actions/workflows/test.yaml) *Memory-efficient immutables in 10.4kB*
 
 ### Install & Use
 
@@ -80,6 +80,243 @@ const [a, b, c] = [1, 2, 3];
 Dict({a, b, c}) === Dict({a, b, c}); // true
 Dict({a, b, c}) === Dict({c, b, a}); // false
 ```
+
+### Schema
+
+A `Schema` allows you to define a complex structure for your immutables. It is defined by one or more SchemaMappers, which take a value and either return it, or throw an error:
+
+```javascript
+import { Schema } from 'libtuple';
+
+const boolSchema = s.boolean();
+
+boolSchema(true);  // returns true
+boolSchema(false); // returns false
+boolSchema(123);   // throws an error
+```
+
+You can create schemas for Tuples, Groups, Records, and Dicts:
+
+```javascript
+const userSchema = s.record({
+    id: s.number(),
+    email: s.string(),
+});
+
+const users = [
+    {id: 1, email: "fake@example.com"},
+    {id: 2, email: "another@example.com"},
+    {id: 3, email: "and_a_third@example.com"},
+]
+
+const userRecord = userSchema(users[0]);
+
+const userListSchema = s.nTuple(userSchema);
+
+const userListTuple = userListSchema(users);
+```
+##### Schema.boolean(options)
+
+* options.map - Callback to transform the value after its been validated.
+
+##### Schema.number(options)
+
+* options.min - Min value
+* options.max - Max value
+* options.map - Callback to transform the value after its been validated.
+* options.check - Throw a TypeError if this returns false.
+
+##### Schema.string(options)
+
+* options.min - Min length
+* options.max - Max length
+* options.map - Callback to transform the value after its been validated.
+* options.match - Throw a TypeError if this does NOT match
+* options.noMatch - Throw a TypeError if this DOES match
+* options.check - Throw a TypeError if this returns false.
+
+##### Schema.array(options)
+
+* options.min - Min length
+* options.max - Max length
+* options.map - Callback to transform the value after its been validated.
+* options.each - Callback to transform each element.
+* options.check - Throw a TypeError if this returns false.
+
+##### Schema.object(options)
+
+* options.class - Throw a TypeError if the class does not match.
+* options.map - Callback to transform the value after its been validated.
+* options.each - Callback to transform each element.
+* options.check - Throw a TypeError if this returns false.
+
+##### Schema.function(options)
+
+* options.map - Callback to transform the value after its been validated.
+* options.check - Throw a TypeError if this returns false.
+
+##### Schema.symbol(options)
+
+* options.map - Callback to transform the value after its been validated.
+* options.check - Throw a TypeError if this returns false.
+
+##### Schema.null(options)
+
+* options.map - Callback to transform the value after its been validated.
+
+##### Schema.undefined(options)
+
+* options.map - Callback to transform the value after its been validated.
+
+##### Schema.value(options)
+
+* options.map - Callback to transform the value after its been validated.
+* options.check - Throw a TypeError if this returns false.
+
+##### Schema.drop()
+
+Drop the value (always maps to `undefined`)
+
+##### Schema.or()
+
+Map the value with the first matching SchemaMapper
+
+```javascript
+import { Schema as s } from 'libtuple';
+
+const dateSchema = s.or(
+    s.string({match: /\d\d \w+ \d\d\d\d \d\d:\d\d:\d\d \w+?/, map: s => new Date(s)})
+    , s.object({class: Date})
+);
+
+console.log( dateSchema('04 Apr 1995 00:12:00 GMT') );
+console.log( dateSchema(new Date) );
+```
+
+##### Schema.repeat(, schemaMapper)
+
+Repeat a SchemaMapper n times
+
+##### Schema.tuple(...values)
+
+Map one or more values to a Tuple.
+
+```javascript
+import { Schema as s } from 'libtuple';
+
+const pointSchema = s.tuple(s.number(), s.number());
+
+const point = pointSchema([5, 10]);
+```
+
+##### Schema.group(...values)
+
+Map one or more values to a Group.
+
+##### Schema.record(properties)
+
+Map one or more properties to a Record.
+
+```javascript
+const companySchema = s.sDict({
+    name: s.string(),
+    phone: s.string(),
+    address: s.string(),
+});
+
+const company = companySchema({
+    name: 'Acme Corporation',
+    phone: '+1-000-555-1234',
+    address: '123 Fake St, Anytown, USA',
+});
+```
+
+##### Schema.dict(properties)
+
+Map one or more values to a Dict.
+
+##### Schema.nTuple()
+
+Map n values to a Tuple. Will append each value in the input to the Tuple using the same mapper.
+
+##### Schema.nGroup()
+
+Map n values to a Group. Will append each value in the input to the Group using the same mapper.
+
+##### Schema.nRecord()
+
+Map n properties to a Record. Will append additional properties without mapping or validation, if present.
+
+```javascript
+const companySchema = s.sDict({
+    name: s.string(),
+    phone: s.string(),
+    address: s.string(),
+});
+
+const company = companySchema({
+    name: 'Acme Corporation',
+    phone: '+1-000-555-1234',
+    address: '123 Fake St, Anytown, USA',
+    openHours: "9AM-7PM",
+});
+```
+
+##### Schema.nDict()
+
+Map n properties to a Dict. Will append additional properties without mapping or validation, if present.
+
+##### Schema.sTuple()
+
+Strictly map values to a Tuple. Will throw an error if the number of values does not match.
+
+```javascript
+import { Schema as s } from 'libtuple';
+
+const pointSchema = s.sTuple(s.number(), s.number());
+
+const pointA = pointSchema([5, 10]);
+const pointB = pointSchema([5, 10, 1]); // ERROR!
+```
+
+##### Schema.sGroup()
+
+Strictly map values to a Group. Will throw an error if the number of values does not match.
+
+##### Schema.sRecord()
+
+Strictly map values to a Record. Will throw an error if the number of values does not match.
+
+##### Schema.sDict()
+
+Strictly map values to a Dict. Will throw an error if the number of values does not match.
+
+##### Schema.xTuple()
+
+Exclusively map values to a Tuple. Will drop any keys not present in the schema.
+
+```javascript
+import { Schema as s } from 'libtuple';
+
+const pointSchema = s.sTuple(s.number(), s.number());
+
+const pointA = pointSchema([5, 10]); // [5, 10]
+const pointB = pointSchema([5, 10, 1]); // Also [5, 10]
+
+console.log(pointB[2]); //undefined
+```
+
+##### Schema.xGroup()
+
+Exclusively map values to a Group. Will drop any keys not present in the schema.
+
+##### Schema.xRecord()
+
+Exclusively map values to a Record. Will drop any keys not present in the schema.
+
+##### Schema.xDict()
+
+Exclusively map values to a Dict. Will drop any keys not present in the schema.
 
 ## Gotchas
 

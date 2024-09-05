@@ -15,6 +15,7 @@
 		"Group.mjs",
 		"Record.mjs",
 		"Dict.mjs",
+		"Schema.mjs",
 		"index.mjs",
 		"README.md",
 		"LICENSE",
