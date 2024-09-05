@@ -60,9 +60,13 @@ const Schema = {
 	record(schema = {})
 	{
 		return (arg, path = '') => {
-			const entries = Object.entries(arg);
-			return Record(Object.fromEntries(
-				entries.map(([key, value]) => [key, schema[key] ? schema[key](value, `${path || 'root'}[${key}]`) : value])
+			const entries = Object.entries(schema);
+			return Record(Object.assign(
+				{},
+				arg,
+				Object.fromEntries(
+					entries.map(([key, schema]) => [key, schema(arg[key], `${path || 'root'}[${key}]`)])
+				)
 			));
 		}
 	},
@@ -984,7 +988,7 @@ const Schema = {
 				}
 			}
 
-			const multi = new Error(errors.map(e => e.message).join(", "));
+			const multi = new Error(errors.map(e => e.message).join(', '));
 			multi.errors = errors;
 			throw multi;
 		};

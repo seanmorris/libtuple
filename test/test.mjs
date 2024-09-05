@@ -6,7 +6,7 @@ import Group from '../Group.mjs';
 import Record from '../Record.mjs';
 import Dict from '../Dict.mjs';
 
-import { size } from "../Tuple.mjs";
+import { size } from '../Tuple.mjs';
 
 const tests  = [];
 

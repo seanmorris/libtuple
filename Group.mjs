@@ -1,5 +1,5 @@
-import Tuple from "./Tuple.mjs";
-import { _index, size } from "./Tuple.mjs";
+import Tuple from './Tuple.mjs';
+import { _index, size } from './Tuple.mjs';
 
 const base = Object.create(null);
 base.toString = Object.prototype.toString;
