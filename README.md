@@ -173,7 +173,7 @@ const userSchema = s.record({
     email: s.string(),
 });
 
-const userRecord = userSchema({id: 1, email: "fake@example.com"});
+const userRecord = userSchema({id: 1, email: 'fake@example.com'});
 
 console.log(userRecord);
 ```
@@ -463,8 +463,8 @@ const company = companySchema({
     name: 'Acme Corporation',
     phone: '+1-000-555-1234',
     address: '123 Fake St, Anytown, USA',
-    openHours: "9AM-7PM",
-    slogan: "We do business.",
+    openHours: '9AM-7PM',
+    slogan: 'We do business.',
 });
 ```
 
@@ -513,8 +513,8 @@ companySchema({
     name: 'Acme Corporation',
     phone: '+1-000-555-1234',
     address: '123 Fake St, Anytown, USA',
-    openHours: "9AM-7PM",
-    slogan: "We do business.",
+    openHours: '9AM-7PM',
+    slogan: 'We do business.',
 });
 ```
 
@@ -557,8 +557,8 @@ const company = companySchema({
     name: 'Acme Corporation',
     phone: '+1-000-555-1234',
     address: '123 Fake St, Anytown, USA',
-    openHours: "9AM-7PM",
-    slogan: "We do business.",
+    openHours: '9AM-7PM',
+    slogan: 'We do business.',
 });
 
 console.log({company});
