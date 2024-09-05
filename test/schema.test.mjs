@@ -7,6 +7,8 @@ import Tuple from '../Tuple.mjs';
 
 const s = Schema;
 
+const [major, minor, patch] = process.versions.node.split('.');
+
 test('s.boolean test', t => {
 	const schema = s.boolean();
 	assert.strictEqual(s.parse(schema, false), false);
@@ -152,7 +154,7 @@ test('s.uuidString test', t => {
 	assert.throws(() => schema('this is not a uuid'), 'SchemaMapper should throw errors on bad value.');
 });
 
-test('s.urlString test', t => {
+test('s.urlString test', {skip: major < 18 ? 'https://developer.mozilla.org/en-US/docs/Web/API/URL/canParse_static' : false}, t => {
 	const schema = s.urlString();
 	assert.strictEqual(s.parse(schema, 'https://example.com'), 'https://example.com');
 	assert.strictEqual(s.parse(schema, 'https://example.com/'), 'https://example.com/');
@@ -244,8 +246,6 @@ test('s.function test', t => {
 
 	assert.throws(() => schema(0x29a), 'SchemaMapper should throw errors on bad value.');
 });
-
-const [major, minor, patch] = process.versions.node.split('.');
 
 test('s.symbol test', {skip: major < 20 ? 'https://github.com/nodejs/node/issues/49135' : false}, t => {
 	const schema = s.symbol();
