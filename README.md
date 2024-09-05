@@ -576,6 +576,8 @@ Exclusively map values to a Group. Will drop any keys not present in the schema.
 
 #### Schema.xRecord(properties)
 
+Exclusively map values to a Record. Will drop any keys not present in the schema.
+
 ```javascript
 const companySchema = s.xRecord({
     name: s.string(),
@@ -593,8 +595,6 @@ const company = companySchema({
 
 console.log({company});
 ```
-
-Exclusively map values to a Record. Will drop any keys not present in the schema.
 
 #### Schema.xDict(properties)
 
