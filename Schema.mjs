@@ -278,7 +278,7 @@ const Schema = {
 	/**
 	 * Exclusively map an object to a Record.
 	 * Will drop any keys not present in the schema.
-	  * @param {Object.<string, SchemaMapper>} schema - An Object holding SchemaMappers
+	 * @param {Object.<string, SchemaMapper>} schema - An Object holding SchemaMappers
 	 */
 	xRecord(schema)
 	{
@@ -293,7 +293,7 @@ const Schema = {
 	/**
 	 * Exclusively map an object to a Dict.
 	 * Will drop any keys not present in the schema.
-	  * @param {Object.<string, SchemaMapper>} schema - An Object holding SchemaMappers
+	 * @param {Object.<string, SchemaMapper>} schema - An Object holding SchemaMappers
 	 */
 	xDict(schema)
 	{
@@ -610,7 +610,7 @@ const Schema = {
 
 	uuidString(options = {})
 	{
-		const checks = [ value =>  String(value).match(/^[a-z,0-9]{8}-[a-z,0-9]{4}-[a-z,0-9]{4}-[a-z,0-9]{4}-[a-z,0-9]{12}$/i) ];
+		const checks = [ value => String(value).match(/^[a-z,0-9]{8}-[a-z,0-9]{4}-[a-z,0-9]{4}-[a-z,0-9]{4}-[a-z,0-9]{12}$/i) ];
 
 		if(options.check)
 		{
@@ -634,7 +634,7 @@ const Schema = {
 	 */
 	urlString(options = {})
 	{
-		const checks = [ value =>  URL.canParse(value) ];
+		const checks = [ URL.canParse ? value => URL.canParse(value) : value => { try { new URL(value); return true; } catch { return false; } } ];
 
 		if(options.check)
 		{
@@ -658,7 +658,7 @@ const Schema = {
 	 */
 	emailString(options = {})
 	{
-		const checks = [ value =>  {
+		const checks = [ value => {
 			const atPos = value.indexOf('@');
 			const atPos2 = value.indexOf('@', atPos + 1);
 			const dotPos = value.indexOf('.', atPos);
@@ -678,7 +678,7 @@ const Schema = {
 
 	regexString(options = {})
 	{
-		const checks = [ value =>  { try { RegExp(value); return !!value; } catch { return false; } } ];
+		const checks = [ value => { try { RegExp(value); return !!value; } catch { return false; } } ];
 
 		if(options.check)
 		{
@@ -726,7 +726,7 @@ const Schema = {
 	 */
 	jsonString(options = {})
 	{
-		const checks = [ value =>  { try { JSON.parse(value); return true; } catch { return false; } } ];
+		const checks = [ value => { try { JSON.parse(value); return true; } catch { return false; } } ];
 
 		if(options.check)
 		{
@@ -970,7 +970,7 @@ const Schema = {
 
 	/**
 	 * Map the value with the first matching SchemaMapper
-	 * @param  {...function(options):value} mappers
+	 * @param {...function(options):value} mappers
 	 */
 	or(...mappers)
 	{

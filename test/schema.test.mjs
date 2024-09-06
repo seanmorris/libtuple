@@ -154,7 +154,7 @@ test('s.uuidString test', t => {
 	assert.throws(() => schema('this is not a uuid'), 'SchemaMapper should throw errors on bad value.');
 });
 
-test('s.urlString test', {skip: major < 18 ? 'https://developer.mozilla.org/en-US/docs/Web/API/URL/canParse_static' : false}, t => {
+test('s.urlString test', t => {
 	const schema = s.urlString();
 	assert.strictEqual(s.parse(schema, 'https://example.com'), 'https://example.com');
 	assert.strictEqual(s.parse(schema, 'https://example.com/'), 'https://example.com/');
