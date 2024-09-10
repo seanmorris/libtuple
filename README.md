@@ -142,7 +142,7 @@ Dict({a, b, c}) === Dict({c, b, a}); // false
 
 ### Schema
 
-A `Schema` allows you to define a complex structure for your immutables. It is defined by one or more SchemaMappers, which take a value and either return it, or throw an error:
+A `Schema` allows you to define a complex structure for your immutables. It is defined by one or more SchemaMappers, which take a value and will either return it, or throw an error:
 
 ```javascript
 import { Schema as s } from 'libtuple';
