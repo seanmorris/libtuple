@@ -29,7 +29,15 @@ let index = 0;
 Object.freeze(terminator);
 Object.freeze(base);
 
-const registry = new FinalizationRegistry(held => scalarMap.delete(held));
+const registry = new FinalizationRegistry(held => {
+	if(scalarMap.has(held) && scalarMap.get(held).deref() !== undefined)
+	{
+		// Preventing race condition #1 outlined here:
+		// https://github.com/seanmorris/libtuple/issues/2
+		return;
+	}
+	scalarMap.delete(held);
+});
 
 export default function Tuple(...args)
 {
@@ -111,6 +119,7 @@ export default function Tuple(...args)
 			const a = (this ? this.args : args);
 			const result = Object.create(this ? this.base : base);
 			const length = Array.isArray(a) ? a.length : Object.keys(a).length;
+
 			Object.assign(result, a);
 			Object.defineProperties(result, {
 				length: {value: length},
@@ -118,17 +127,20 @@ export default function Tuple(...args)
 				[keys]: {value: this && this.keys},
 				[_index]: {value: index++}
 			});
+
 			Object.freeze(result);
 
-			if(!scalarMap.has(part))
+			// Preventing race condition #2 outlined here:
+			// https://github.com/seanmorris/libtuple/issues/2
+			if(scalarMap.has(part) && scalarMap.get(part).deref() !== undefined)
+			{
+				return scalarMap.get(part).deref();
+			}
+			else
 			{
 				registry.register(result, part);
 				scalarMap.set(part, new WeakRef(result));
 				return result;
-			}
-			else
-			{
-				return scalarMap.get(part).deref();
 			}
 		}
 

@@ -7,22 +7,6 @@ import Dict from './Dict.mjs';
  * @callback SchemaMapper
  */
 
-/**
- * Maps keys and values to a Record.
- * Will append additional keys as plain values if more values are provided than appear in the schema.
- * @callback RecordMapper
- * @param {Array} args A list of values
- * @returns {Record}
- */
-
-/**
- * Maps keys and values to a Dict.
- * Will append additional keys as plain values if more values are provided than appear in the schema.
- * @callback DictMapper
- * @param {Array} args A list of values
- * @returns {Dict}
- */
-
 const Schema = {
 	/**
 	 * Map one or more values to a Tuple.
