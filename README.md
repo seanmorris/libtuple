@@ -1,6 +1,6 @@
 # libtuple
 
-[![Test](https://github.com/seanmorris/libtuple/actions/workflows/test.yaml/badge.svg)](https://github.com/seanmorris/libtuple/actions/workflows/test.yaml) *Memory-efficient immutables in 10.4kB*
+[![Test](https://github.com/seanmorris/libtuple/actions/workflows/test.yaml/badge.svg)](https://github.com/seanmorris/libtuple/actions/workflows/test.yaml)
 
 ### Install & Use
 
