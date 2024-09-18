@@ -11,14 +11,15 @@
 	},
 	"license": "Apache 2.0",
 	"files": [
-		"Tuple.mjs",
-		"Group.mjs",
-		"Record.mjs",
 		"Dict.mjs",
-		"Schema.mjs",
-		"index.mjs",
-		"README.md",
+		"Group.mjs",
 		"LICENSE",
-		"NOTICE"
+		"NOTICE",
+		"README.md",
+		"Record.mjs",
+		"Schema.mjs",
+		"Tuple.mjs",
+		"index.mjs",
+		"package.json"
 	]
 }
