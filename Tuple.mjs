@@ -112,7 +112,7 @@ export default function Tuple(...args)
 
 	if(!mode)
 	{
-		part = JSON.stringify(part.map(p => `${typeof p}::${p}`));
+		part = JSON.stringify(part.map(p => `${typeof p}::${Object.is(p, -0) ? '-0' : p}`));
 
 		if(!maps)
 		{

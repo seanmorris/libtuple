@@ -736,6 +736,15 @@ tests.push(test('Dict JSON Test', t => {
 	assert.strictEqual(JSON.stringify(d1), '{"id":1,"name":"Test"}');
 }));
 
+tests.push(test('Negative Zero Test', t => {
+	const positive = Tuple(Object, 0);
+	const negative = Tuple(Object, -0);
+	assert.ok(Object.is(positive[1], 0));
+	assert.ok(Object.is(negative[1], -0));
+	assert.ok(!Object.is(positive[1], -0));
+	assert.ok(!Object.is(negative[1], 0));
+}));
+
 test(`Ensure memory isn\'t leaking for scalar keys`, async t => {
 	await Promise.allSettled(tests)
 
