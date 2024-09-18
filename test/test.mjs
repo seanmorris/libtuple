@@ -737,13 +737,33 @@ tests.push(test('Dict JSON Test', t => {
 }));
 
 tests.push(test('Negative Zero Test', t => {
-	const positive = Tuple(Object, 0);
-	const negative = Tuple(Object, -0);
-	assert.ok(Object.is(positive[1], 0));
-	assert.ok(Object.is(negative[1], -0));
-	assert.ok(!Object.is(positive[1], -0));
-	assert.ok(!Object.is(negative[1], 0));
+	const positive0 = Tuple(0);
+	const negative0 = Tuple(-0);
+
+	assert.ok(Object.is(positive0[0], 0));
+	assert.ok(Object.is(negative0[0], -0));
+	assert.ok(!Object.is(positive0[0], -0));
+	assert.ok(!Object.is(negative0[0], 0));
+
+	assert.ok(Object.is(Tuple(0)[0], 0));
+	assert.ok(Object.is(Tuple(-0)[0], -0));
+	assert.ok(!Object.is(Tuple(0)[0], -0));
+	assert.ok(!Object.is(Tuple(-0)[0], 0));
+
+	const positive1 = Tuple(Object, 0);
+	const negative1 = Tuple(Object, -0);
+
+	assert.ok(Object.is(positive1[1], 0));
+	assert.ok(Object.is(negative1[1], -0));
+	assert.ok(!Object.is(positive1[1], -0));
+	assert.ok(!Object.is(negative1[1], 0));
+
+	assert.ok(Object.is(Tuple(Object, 0)[1], 0));
+	assert.ok(Object.is(Tuple(Object, -0)[1], -0));
+	assert.ok(!Object.is(Tuple(Object, 0)[1], -0));
+	assert.ok(!Object.is(Tuple(Object, -0)[1], 0));
 }));
+
 
 test(`Ensure memory isn\'t leaking for scalar keys`, async t => {
 	await Promise.allSettled(tests)
