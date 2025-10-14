@@ -1,6 +1,6 @@
 # libtuple
 
-*Memory-efficient immutables in 13.5kB*
+*Memory-efficient immutables in 9kB*
 
 [![npm version](https://img.shields.io/npm/v/libtuple?color=7f3d65&label=libtuple&style=for-the-badge)](https://www.npmjs.com/package/libtuple)  [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/seanmorris/libtuple/test.yaml?style=for-the-badge&link=https%3A%2F%2Fgithub.com%2Fseanmorris%2Flibtuple)](https://github.com/seanmorris/libtuple/actions/workflows/test.yaml)  [![License](https://img.shields.io/npm/l/libtuple?logo=apache&color=427819&style=for-the-badge)](https://github.com/seanmorris/libtuple/blob/master/LICENSE)
 
