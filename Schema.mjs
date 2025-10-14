@@ -15,9 +15,9 @@ const Schema = {
 	 */
 	tuple(...schema)
 	{
-		return (args = [], path = '') => {
+		return (args = [], path = 'root') => {
 			return Tuple(...args.map(
-				(arg, index) => schema[index] ? schema[index](arg, `${path || 'root'}[${index}]`): arg
+				(arg, index) => schema[index] ? schema[index](arg, `${path}[${index}]`): arg
 			));
 		}
 	},
@@ -29,9 +29,9 @@ const Schema = {
 	 */
 	group(...schema)
 	{
-		return (args = [], path = '') => {
+		return (args = [], path = 'root') => {
 			return Group(...args.map(
-				(arg, index) => schema[index] ? schema[index](arg, `${path || 'root'}[${index}]`): arg
+				(arg, index) => schema[index] ? schema[index](arg, `${path}[${index}]`): arg
 			));
 		}
 	},
@@ -43,13 +43,13 @@ const Schema = {
 	 */
 	record(schema = {})
 	{
-		return (arg, path = '') => {
+		return (arg, path = 'root') => {
 			const schemaEntries = Object.entries(schema);
 			return Record(Object.assign(
 				{},
 				arg,
 				Object.fromEntries(
-					schemaEntries.map(([key, schema]) => [key, schema(arg[key], `${path || 'root'}[${key}]`)])
+					schemaEntries.map(([key, schema]) => [key, schema(arg[key], `${path}[${key}]`)])
 				)
 			));
 		}
@@ -62,10 +62,10 @@ const Schema = {
 	 */
 	dict(schema = {})
 	{
-		return (arg, path = '') => {
+		return (arg, path = 'root') => {
 			const entries = Object.entries(arg);
 			return Dict(Object.fromEntries(
-				entries.map(([key, value]) => [key, schema[key] ? schema[key](value, `${path || 'root'}[${key}]`) : value])
+				entries.map(([key, value]) => [key, schema[key] ? schema[key](value, `${path}[${key}]`) : value])
 			));
 		}
 	},
@@ -77,13 +77,13 @@ const Schema = {
 	 */
 	sTuple(...schema)
 	{
-		return (args, path = '') => {
+		return (args, path = 'root') => {
 			if(schema.length !== args.length)
 			{
-				throw new TypeError(`Expected ${schema.length} elements, got ${args.length} elements at ${path || 'root'}.`);
+				throw new TypeError(`Expected ${schema.length} elements, got ${args.length} elements at ${path}.`);
 			}
 			return Tuple(...args.map(
-				(arg, index) => schema[index] ? schema[index](arg, `${path || 'root'}[${index}]`): arg
+				(arg, index) => schema[index] ? schema[index](arg, `${path}[${index}]`): arg
 			));
 		}
 	},
@@ -95,13 +95,13 @@ const Schema = {
 	 */
 	sGroup(...schema)
 	{
-		return (args, path = '') => {
+		return (args, path = 'root') => {
 			if(schema.length !== args.length)
 			{
-				throw new TypeError(`Expected ${schema.length} elements, got ${args.length} elements at ${path || 'root'}.`);
+				throw new TypeError(`Expected ${schema.length} elements, got ${args.length} elements at ${path}.`);
 			}
 			return Group(...args.map(
-				(arg, index) => schema[index] ? schema[index](arg, `${path || 'root'}[${index}]`): arg
+				(arg, index) => schema[index] ? schema[index](arg, `${path}[${index}]`): arg
 			));
 		}
 	},
@@ -113,12 +113,12 @@ const Schema = {
 	 */
 	sRecord(schema = {})
 	{
-		return (arg, path = '') => {
+		return (arg, path = 'root') => {
 			const schemaLength = Object.keys(schema).length;
 			const entries = Object.entries(arg);
 			if(schemaLength > entries.length)
 			{
-				throw new TypeError(`Expected ${schemaLength} elements, got ${entries.length} elements at ${path || 'root'}.`);
+				throw new TypeError(`Expected ${schemaLength} elements, got ${entries.length} elements at ${path}.`);
 			}
 			return Record(Object.fromEntries(
 				entries.map(([key, value]) => {
@@ -139,12 +139,12 @@ const Schema = {
 	 */
 	sDict(schema = {})
 	{
-		return (arg, path = '') => {
+		return (arg, path = 'root') => {
 			const entries = Object.entries(arg);
 			const schemaLength = Object.keys(schema).length;
 			if(schemaLength > entries.length)
 			{
-				throw new TypeError(`Expected ${schemaLength} elements, got ${entries.length} elements at ${path || 'root'}.`);
+				throw new TypeError(`Expected ${schemaLength} elements, got ${entries.length} elements at ${path}.`);
 			}
 			return Dict(Object.fromEntries(
 				entries.map(([key, value]) => {
@@ -165,13 +165,13 @@ const Schema = {
 	 */
 	xTuple(...schema)
 	{
-		return (args, path = '') => {
+		return (args, path = 'root') => {
 			if(schema.length > args.length)
 			{
-				throw new TypeError(`Expected ${schema.length} elements, got ${args.length} elements at ${path || 'root'}.`);
+				throw new TypeError(`Expected ${schema.length} elements, got ${args.length} elements at ${path}.`);
 			}
 			return Tuple(...schema.map(
-				(schema, index) => schema(args[index], `${path || 'root'}[${index}]`)
+				(schema, index) => schema(args[index], `${path}[${index}]`)
 			));
 		}
 	},
@@ -183,13 +183,13 @@ const Schema = {
 	 */
 	xGroup(...schema)
 	{
-		return (args, path = '') => {
+		return (args, path = 'root') => {
 			if(schema.length > args.length)
 			{
-				throw new TypeError(`Expected ${schema.length} elements, got ${args.length} elements at ${path || 'root'}.`);
+				throw new TypeError(`Expected ${schema.length} elements, got ${args.length} elements at ${path}.`);
 			}
 			return Group(...schema.map(
-				(schema, index) => schema(args[index], `${path || 'root'}[${index}]`)
+				(schema, index) => schema(args[index], `${path}[${index}]`)
 			));
 		}
 	},
@@ -201,10 +201,10 @@ const Schema = {
 	 */
 	xRecord(schema)
 	{
-		return (arg, path = '') => {
+		return (arg, path = 'root') => {
 			const schemaEntries = Object.entries(schema);
 			return Record(Object.fromEntries(
-				schemaEntries.map(([key, schema]) => [key, schema(arg[key], `${path || 'root'}[${key}]`)])
+				schemaEntries.map(([key, schema]) => [key, schema(arg[key], `${path}[${key}]`)])
 			));
 		}
 	},
@@ -216,10 +216,10 @@ const Schema = {
 	 */
 	xDict(schema)
 	{
-		return (arg, path = '') => {
+		return (arg, path = 'root') => {
 			const schemaKeys = Object.keys(schema);
 			return Dict(Object.fromEntries(
-				schemaKeys.map((key) => [key, schema[key](arg[key], `${path || 'root'}[${key}]`)])
+				schemaKeys.map((key) => [key, schema[key](arg[key], `${path}[${key}]`)])
 			));
 		}
 	},
@@ -231,13 +231,15 @@ const Schema = {
 	 */
 	nTuple(schema)
 	{
-		return (args, path) => {
-			if(!Array.isArray(args))
+		return (values, path) => {
+			if(!Array.isArray(values))
 			{
-				args = [args]
+				values = [values]
 			}
 
-			return Tuple(...args.map((arg, index) => schema ? schema(arg, `${path || 'root'}[${index}]`) : arg));
+			return Tuple(...values.map(
+				(value, index) => schema ? schema(value, `${path}[${index}]`) : value)
+			);
 		}
 	},
 
@@ -248,13 +250,13 @@ const Schema = {
 	 */
 	nGroup(schema)
 	{
-		return (args, path = '') => {
+		return (args, path = 'root') => {
 			if(!Array.isArray(args))
 			{
 				args = [args]
 			}
 
-			return Group(...args.map((arg, index) => schema ? schema(arg, `${path || 'root'}[${index}]`) : arg));
+			return Group(...args.map((arg, index) => schema ? schema(arg, `${path}[${index}]`) : arg));
 		}
 	},
 
@@ -264,7 +266,7 @@ const Schema = {
 	 */
 	nRecord(schema = {})
 	{
-		return (args, path = '') => {
+		return (args, path = 'root') => {
 			if(!Array.isArray(args))
 			{
 				args = [args]
@@ -272,7 +274,7 @@ const Schema = {
 			return Tuple(...args.map(arg => {
 				const entries = Object.entries(arg);
 				return Record(Object.fromEntries(
-					entries.map(([key, value]) => [key, schema[key] ? schema[key](value, `${path || 'root'}[${key}]`) : value])
+					entries.map(([key, value]) => [key, schema[key] ? schema[key](value, `${path}[${key}]`) : value])
 				));
 			}));
 		}
@@ -287,7 +289,7 @@ const Schema = {
 		/**
 		 * @type SchemaMapper
 		 */
-		return (args, path = '') => {
+		return (args, path = 'root') => {
 			if(!Array.isArray(args))
 			{
 				args = [args]
@@ -295,7 +297,7 @@ const Schema = {
 			return Tuple(...args.map(arg => {
 				const entries = Object.entries(arg);
 				return Dict(Object.fromEntries(
-					entries.map(([key, value]) => [key, schema[key] ? schema[key](value, `${path || 'root'}[${key}]`) : value])
+					entries.map(([key, value]) => [key, schema[key] ? schema[key](value, `${path}[${key}]`) : value])
 				));
 			}));
 		}
@@ -321,7 +323,7 @@ const Schema = {
 	 */
 	boolean(options = {})
 	{
-		return (value, path = '') => {
+		return (value, path = 'root') => {
 			if(options.optional && value === undefined)
 			{
 				return options.default;
@@ -332,7 +334,7 @@ const Schema = {
 			}
 			if(typeof value !== 'boolean')
 			{
-				throw new TypeError(`Expected boolean, got ${typeof value} at ${path || 'root'}`);
+				throw new TypeError(`Expected boolean, got ${typeof value} at ${path}`);
 			}
 			if(options.map)
 			{
@@ -355,7 +357,7 @@ const Schema = {
 	 */
 	number(options = {})
 	{
-		return (value, path = '') => {
+		return (value, path = 'root') => {
 			if(options.optional && value === undefined)
 			{
 				return options.default;
@@ -366,19 +368,19 @@ const Schema = {
 			}
 			if(typeof value !== 'number')
 			{
-				throw new TypeError(`Expected number, got ${typeof value} at ${path || 'root'}`);
+				throw new TypeError(`Expected number, got ${typeof value} at ${path}`);
 			}
 			if(options.check && !options.check(value))
 			{
-				throw new TypeError(`Validation failed! got ${value} at ${path || 'root'}`);
+				throw new TypeError(`Validation failed! got ${value} at ${path}`);
 			}
 			if('max' in options && options.max < value)
 			{
-				throw new TypeError(`Expected max ${options.max}, got ${value} at ${path || 'root'}`);
+				throw new TypeError(`Expected max ${options.max}, got ${value} at ${path}`);
 			}
 			if('min' in options && options.min > value)
 			{
-				throw new TypeError(`Expected min ${options.min}, got ${value} at ${path || 'root'}`);
+				throw new TypeError(`Expected min ${options.min}, got ${value} at ${path}`);
 			}
 			if(options.map)
 			{
@@ -505,7 +507,7 @@ const Schema = {
 	 */
 	bigint(options = {})
 	{
-		return (value, path = '') => {
+		return (value, path = 'root') => {
 			if(options.optional && value === undefined)
 			{
 				return options.default;
@@ -516,19 +518,19 @@ const Schema = {
 			}
 			if(typeof value !== 'bigint')
 			{
-				throw new TypeError(`Expected bigint, got ${typeof value} at ${path || 'root'}`);
+				throw new TypeError(`Expected bigint, got ${typeof value} at ${path}`);
 			}
 			if(options.check && !options.check(value))
 			{
-				throw new TypeError(`Validation failed! got ${value} at ${path || 'root'}`);
+				throw new TypeError(`Validation failed! got ${value} at ${path}`);
 			}
 			if('max' in options && options.max < value)
 			{
-				throw new TypeError(`Expected max ${options.max}, got ${value} at ${path || 'root'}`);
+				throw new TypeError(`Expected max ${options.max}, got ${value} at ${path}`);
 			}
 			if('min' in options && options.min > value)
 			{
-				throw new TypeError(`Expected min ${options.min}, got ${value} at ${path || 'root'}`);
+				throw new TypeError(`Expected min ${options.min}, got ${value} at ${path}`);
 			}
 			if(options.map)
 			{
@@ -553,7 +555,7 @@ const Schema = {
 	 */
 	string(options = {})
 	{
-		return (value, path = '') => {
+		return (value, path = 'root') => {
 			if(options.optional && value === undefined)
 			{
 				return options.default;
@@ -564,39 +566,39 @@ const Schema = {
 			}
 			if(typeof value !== 'string')
 			{
-				throw new TypeError(`Expected string, got ${typeof value} at ${path || 'root'}`);
+				throw new TypeError(`Expected string, got ${typeof value} at ${path}`);
 			}
 			if(options.check && !options.check(value))
 			{
-				throw new TypeError(`Validation failed! got ${value} at ${path || 'root'}`);
+				throw new TypeError(`Validation failed! got ${value} at ${path}`);
 			}
 			if('max' in options && options.max < value.length)
 			{
-				throw new TypeError(`Expected max length ${options.max}, got "${value}" at ${path || 'root'}`);
+				throw new TypeError(`Expected max length ${options.max}, got "${value}" at ${path}`);
 			}
 			if('min' in options && options.min > value.length)
 			{
-				throw new TypeError(`Expected min length ${options.min}, got "${value}" at ${path || 'root'}`);
+				throw new TypeError(`Expected min length ${options.min}, got "${value}" at ${path}`);
 			}
 			if('prefix' in options && options.prefix !== value.substr(0, options.prefix.length))
 			{
-				throw new TypeError(`Expected prefix ${options.prefix}, got "${value}" at ${path || 'root'}`);
+				throw new TypeError(`Expected prefix ${options.prefix}, got "${value}" at ${path}`);
 			}
 			if('suffix' in options && options.suffix !== value.substr(value.length - options.suffix.length))
 			{
-				throw new TypeError(`Expected suffix ${options.suffix}, got "${value}" at ${path || 'root'}`);
+				throw new TypeError(`Expected suffix ${options.suffix}, got "${value}" at ${path}`);
 			}
 			if('infix' in options && value.indexOf(options.infix) === -1)
 			{
-				throw new TypeError(`Expected infix ${options.infix}, got "${value}" at ${path || 'root'}`);
+				throw new TypeError(`Expected infix ${options.infix}, got "${value}" at ${path}`);
 			}
 			if(options.match && !value.match(options.match))
 			{
-				throw new TypeError(`Expected string to match ${options.match}, got "${value}" at ${path || 'root'}`);
+				throw new TypeError(`Expected string to match ${options.match}, got "${value}" at ${path}`);
 			}
 			if(options.noMatch && value.match(options.noMatch))
 			{
-				throw new TypeError(`Expected string NOT to match ${options.noMatch}, got "${value}" at ${path || 'root'}`);
+				throw new TypeError(`Expected string NOT to match ${options.noMatch}, got "${value}" at ${path}`);
 			}
 			if(options.map)
 			{
@@ -621,7 +623,7 @@ const Schema = {
 	 */
 	numericString(options = {})
 	{
-		return (value, path = '') => {
+		return (value, path = 'root') => {
 			if(options.optional && value === undefined)
 			{
 				return options.default;
@@ -632,15 +634,15 @@ const Schema = {
 			}
 			if(isNaN(value) || value === null || value != Number(value))
 			{
-				throw new TypeError(`Expected numeric, got "${value}" at ${path || 'root'}`);
+				throw new TypeError(`Expected numeric, got "${value}" at ${path}`);
 			}
 			if('max' in options && options.max < Number(value))
 			{
-				throw new TypeError(`Expected max ${options.max}, got "${value}" at ${path || 'root'}`);
+				throw new TypeError(`Expected max ${options.max}, got "${value}" at ${path}`);
 			}
 			if('min' in options && options.min > Number(value))
 			{
-				throw new TypeError(`Expected min ${options.min}, got "${value}" at ${path || 'root'}`);
+				throw new TypeError(`Expected min ${options.min}, got "${value}" at ${path}`);
 			}
 
 			const {min, max, ...newOptions} = options;
@@ -664,7 +666,7 @@ const Schema = {
 	 */
 	dateString(options = {})
 	{
-		return (value, path = '') => {
+		return (value, path = 'root') => {
 			if(options.optional && value === undefined)
 			{
 				return options.default;
@@ -675,15 +677,15 @@ const Schema = {
 			}
 			if(isNaN(Date.parse(value)))
 			{
-				throw new TypeError(`Expected dateString, got "${value}" at ${path || 'root'}`);
+				throw new TypeError(`Expected dateString, got "${value}" at ${path}`);
 			}
 			if('max' in options && options.max < value)
 			{
-				throw new TypeError(`Expected max ${options.max}, got "${value}" at ${path || 'root'}`);
+				throw new TypeError(`Expected max ${options.max}, got "${value}" at ${path}`);
 			}
 			if('min' in options && options.min > value)
 			{
-				throw new TypeError(`Expected min ${options.min}, got "${value}" at ${path || 'root'}`);
+				throw new TypeError(`Expected min ${options.min}, got "${value}" at ${path}`);
 			}
 
 			const {min, max, ...newOptions} = options;
@@ -855,7 +857,7 @@ const Schema = {
 	 */
 	array(options = {})
 	{
-		return (value, path = '') => {
+		return (value, path = 'root') => {
 			if(options.optional && value === undefined)
 			{
 				return options.default;
@@ -866,19 +868,19 @@ const Schema = {
 			}
 			if(!Array.isArray(value))
 			{
-				throw new TypeError(`Expected Array, got ${typeof value} at ${path || 'root'}`);
+				throw new TypeError(`Expected Array, got ${typeof value} at ${path}`);
 			}
 			if(options.check && !options.check(value))
 			{
-				throw new TypeError(`Validation failed! got ${value} at ${path || 'root'}`);
+				throw new TypeError(`Validation failed! got ${value} at ${path}`);
 			}
 			if('max' in options && options.max < value.length)
 			{
-				throw new TypeError(`Expected max length ${options.max}, got "${value.length}" at ${path || 'root'}`);
+				throw new TypeError(`Expected max length ${options.max}, got "${value.length}" at ${path}`);
 			}
 			if('min' in options && options.min > value.length)
 			{
-				throw new TypeError(`Expected min length ${options.min}, got "${value.length}" at ${path || 'root'}`);
+				throw new TypeError(`Expected min length ${options.min}, got "${value.length}" at ${path}`);
 			}
 			if(options.map)
 			{
@@ -906,7 +908,7 @@ const Schema = {
 	 */
 	object(options = {})
 	{
-		return (value, path = '') => {
+		return (value, path = 'root') => {
 			if(options.optional && value === undefined)
 			{
 				return options.default;
@@ -917,15 +919,15 @@ const Schema = {
 			}
 			if(typeof value !== 'object')
 			{
-				throw new TypeError(`Expected object, got ${typeof value} at ${path || 'root'}`);
+				throw new TypeError(`Expected object, got ${typeof value} at ${path}`);
 			}
 			if(options.check && !options.check(value))
 			{
-				throw new TypeError(`Validation failed! got ${value} at ${path || 'root'}`);
+				throw new TypeError(`Validation failed! got ${value} at ${path}`);
 			}
 			if(options.class && !(value instanceof options.class))
 			{
-				throw new TypeError(`Expected object of type ${options.class.name}, got Object of type ${value.constructor ? value.constructor.name : 'null'} at ${path || 'root'}`);
+				throw new TypeError(`Expected object of type ${options.class.name}, got Object of type ${value.constructor ? value.constructor.name : 'null'} at ${path}`);
 			}
 			if(options.map)
 			{
@@ -941,7 +943,7 @@ const Schema = {
 
 	date(options = {})
 	{
-		return (value, path = '') => {
+		return (value, path = 'root') => {
 			if(options.optional && value === undefined)
 			{
 				return options.default;
@@ -952,15 +954,15 @@ const Schema = {
 			}
 			if(!(value instanceof Date))
 			{
-				throw new TypeError(`Expected Date, got "${value}" at ${path || 'root'}`);
+				throw new TypeError(`Expected Date, got "${value}" at ${path}`);
 			}
 			if('max' in options && options.max < value)
 			{
-				throw new TypeError(`Expected max ${options.max}, got "${value}" at ${path || 'root'}`);
+				throw new TypeError(`Expected max ${options.max}, got "${value}" at ${path}`);
 			}
 			if('min' in options && options.min > value)
 			{
-				throw new TypeError(`Expected min ${options.min}, got "${value}" at ${path || 'root'}`);
+				throw new TypeError(`Expected min ${options.min}, got "${value}" at ${path}`);
 			}
 
 			return Schema.object({...options, class: Date})(value);
@@ -978,7 +980,7 @@ const Schema = {
 	 */
 	function(options = {})
 	{
-		return (value, path = '') => {
+		return (value, path = 'root') => {
 			if(options.optional && value === undefined)
 			{
 				return options.default;
@@ -989,11 +991,11 @@ const Schema = {
 			}
 			if(typeof value !== 'function')
 			{
-				throw new TypeError(`Expected function, got ${typeof value} at ${path || 'root'}`);
+				throw new TypeError(`Expected function, got ${typeof value} at ${path}`);
 			}
 			if(options.check && !options.check(value))
 			{
-				throw new TypeError(`Validation failed! got ${value} at ${path || 'root'}`);
+				throw new TypeError(`Validation failed! got ${value} at ${path}`);
 			}
 			if(options.map)
 			{
@@ -1014,7 +1016,7 @@ const Schema = {
 	 */
 	symbol(options = {})
 	{
-		return (value, path = '') => {
+		return (value, path = 'root') => {
 			if(options.optional && value === undefined)
 			{
 				return options.default;
@@ -1025,11 +1027,11 @@ const Schema = {
 			}
 			if(typeof value !== 'symbol')
 			{
-				throw new TypeError(`Expected symbol, got ${typeof value} at ${path || 'root'}`);
+				throw new TypeError(`Expected symbol, got ${typeof value} at ${path}`);
 			}
 			if(options.check && !options.check(value))
 			{
-				throw new TypeError(`Validation failed! got ${value} at ${path || 'root'}`);
+				throw new TypeError(`Validation failed! got ${value} at ${path}`);
 			}
 			if(options.map)
 			{
@@ -1048,14 +1050,14 @@ const Schema = {
 	 */
 	null(options = {})
 	{
-		return (value, path = '') => {
+		return (value, path = 'root') => {
 			if(options.optional && value === undefined)
 			{
 				return options.default;
 			}
 			if(value !== null)
 			{
-				throw new TypeError(`Expected null, got ${typeof value} at ${path || 'root'}`);
+				throw new TypeError(`Expected null, got ${typeof value} at ${path}`);
 			}
 			if(options.map)
 			{
@@ -1075,7 +1077,7 @@ const Schema = {
 	 */
 	undefined(options = {})
 	{
-		return (value, path = '') => {
+		return (value, path = 'root') => {
 			if(options.optional && value === undefined)
 			{
 				return options.default;
@@ -1086,7 +1088,7 @@ const Schema = {
 			}
 			if(value !== undefined)
 			{
-				throw new TypeError(`Expected undefined, got ${typeof value} at ${path || 'root'}`);
+				throw new TypeError(`Expected undefined, got ${typeof value} at ${path}`);
 			}
 			if(options.map)
 			{
@@ -1106,7 +1108,7 @@ const Schema = {
 		return (value, path) => {
 			if(value !== options.value)
 			{
-				throw new TypeError(`Expected oneOf ${options.value}, got ${value} at ${path || 'root'}`);
+				throw new TypeError(`Expected oneOf ${options.value}, got ${value} at ${path}`);
 			}
 			return options.value;
 		};
@@ -1133,7 +1135,7 @@ const Schema = {
 	 */
 	value(options = {})
 	{
-		return (value, path = '') => {
+		return (value, path = 'root') => {
 			if(options.optional && value === undefined)
 			{
 				return options.default;
@@ -1158,10 +1160,10 @@ const Schema = {
 	 */
 	oneOf(literals = [], options = {})
 	{
-		return (value, path = '') => {
+		return (value, path = 'root') => {
 			if(!literals.includes(value))
 			{
-				throw new TypeError(`Expected oneOf ${literals.join(', ')}, got ${value} at ${path || 'root'}`);
+				throw new TypeError(`Expected oneOf ${literals.join(', ')}, got ${value} at ${path}`);
 			}
 			if(options.map)
 			{
@@ -1250,7 +1252,7 @@ const Schema = {
 				return value;
 			}
 
-			throw new TypeError(`Expected ${path || 'root'} to NOT match.`);
+			throw new TypeError(`Expected ${path} to NOT match.`);
 		};
 	},
 
