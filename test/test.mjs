@@ -764,7 +764,6 @@ tests.push(test('Negative Zero Test', t => {
 	assert.ok(!Object.is(Tuple(Object, -0)[1], 0));
 }));
 
-
 test(`Ensure memory isn\'t leaking for scalar keys`, async t => {
 	await Promise.allSettled(tests)
 

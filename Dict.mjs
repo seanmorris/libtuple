@@ -3,8 +3,10 @@ import { size, keys } from './Tuple.mjs';
 
 const base = Object.create(null);
 base.toString = Object.prototype.toString;
-
 base[Symbol.toStringTag] = 'Dict';
+base.toJSON = function() {
+	return {...this};
+};
 base[Symbol.iterator] = function() {
 	let index = 0;
 	return { next: () => {
@@ -22,7 +24,7 @@ export default function Dict(obj = {})
 {
 	if(new.target)
 	{
-		throw new Error('"Dict" is not a constructor. Create a Record by invoking the function directly.');
+		throw new Error('"Dict" is not a constructor. Create a Dict by invoking the function directly.');
 	}
 
 	if(!obj || typeof obj !== 'object')
@@ -34,5 +36,5 @@ export default function Dict(obj = {})
 	const values = Object.values(obj);
 
 	const tagged = Tuple.bind({args: obj, base, length: keys.length, keys});
-	return tagged('dict', Tuple(...keys), Tuple(...values));
+	return tagged(Tuple(...keys), Tuple(...values), 'dict');
 }

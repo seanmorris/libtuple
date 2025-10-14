@@ -3,7 +3,9 @@ import { size, keys } from './Tuple.mjs';
 
 const base = Object.create(null);
 base.toString = Object.prototype.toString;
-
+base.toJSON = function() {
+	return {...this};
+};
 base[Symbol.toStringTag] = 'Record';
 base[Symbol.iterator] = function() {
 	let index = 0;
@@ -33,6 +35,6 @@ export default function Record(obj = {})
 	const keys = Object.keys(entries);
 	const values = Object.values(entries);
 
-	const tagged = Tuple.bind({args: obj, base, length: keys.length, keys});
+	const tagged = Tuple.bind({args: entries, base, length: keys.length, keys});
 	return tagged(Tuple(...keys), Tuple(...values), 'record');
 }

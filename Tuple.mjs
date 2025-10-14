@@ -11,7 +11,7 @@ base.toString = Object.prototype.toString;
 base[Symbol.toStringTag] = 'Tuple';
 base.toJSON = function() {
 	return [...this];
-}
+};
 base[Symbol.iterator] = function() {
 	let index = 0;
 	return { next: () => {
@@ -72,7 +72,7 @@ export default function Tuple(...args)
 		}
 		else if(canMap)
 		{
-			prefix = JSON.stringify(part.map(p => `${typeof p}::${p}`))
+			prefix = JSON.stringify(part.map(p => `${typeof p}::${p}`));
 		}
 		else
 		{
