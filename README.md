@@ -151,14 +151,52 @@ Dict({a, b, c}) === Dict({a, b, c}); // true
 Dict({a, b, c}) === Dict({c, b, a}); // false
 ```
 
-### Schema
+## Gotchas
 
-A `Schema` allows you to define a complex structure for your immutables. It is defined by one or more SchemaMappers, which take a value and will either return it, or throw an error:
+In JavaScript, object comparisons are based on reference, not on the actual content of the objects. This means that even if two objects have the same properties and values, they are considered different if they do not reference the same memory location.
+
+For example, the following comparison returns false because each {} creates a new, unique object:
+
+```javascript
+Tuple( {} ) === Tuple( {} ); // FALSE!!!
+```
+
+Each {} is a different object in memory, so the tuples containing them are not strictly equal. This is an important behavior to understand when working with tuples that contain objects.
+
+To get the same tuple, you need to use the exact same object reference:
+
+```javascript
+const a = {};
+
+Tuple( a ) === Tuple( a ); // true :)
+```
+
+## How It Works
+
+A *tuple* is a type represented by a sequence of values. Unlike arrays, where `[1, 2] !== [1, 2]` (as they hold different object references), tuples provide a mechanism where `Tuple(1, 2) === Tuple(1, 2)`. This ensures that tuples with the same values are always strictly equal, simplifying equality checks and enhancing memory efficiency.
+
+For a sequence of primitives, this is trivial. Simply run `JSON.stringify` on the list of values and you've got a unique scalar that you can compare against others, and the object-reference problem is gone. Once you add objects to the mix, however, things can get complicated.
+
+Stringifying objects won't work, since given almost any stringification mechanism, two completely disparate objects can be coerced to resolve the same value. That only leaves us with bean-counting. If we keep track of which objects and scalars we've seen, we can use the unique value of the object reference itself to construct a path through a tree of `Maps` where the leaves are the ultimate scalar value of the tuple. But in that case we'll use memory to hold objects and scalars in memory long after their tuples are useful. It seems we're backed into a corner here.
+
+We could use trees of `WeakMaps` instead, however this case would only allow us to use objects, since scalars cannot be used as keys to a `WeakMap`. We'd end up with two disparate mechanisms, one for lists of only scalars, and one for lists of only objects. We just can't win here!
+
+And that's where prefix-trees come in. Before constructing a tree of `WeakMaps`, the function will group all neighboring scalars into singular values. This will then leave us with a list of objects interspersed by singular scalars. Each scalar is then considered the prefix of the next object. When constructing or traversing the tree, first we come upon a node representing the object, then its prefix, then the next object in the chain. If the first (or any) object has no scalar prefix, we simply move directly to the next object. If the list ends in a scalar, simply add a terminator object reference as a key to the leaf, which holds the actual tuple object.
+
+Organizing the hierarchy with the scalar prefixes *after* the objects allows us to exploit the `WeakMap`'s garbage collection behavior. Once the object keys are GC'ed, so are the entries of the `WeakMap`. Holding a key here does not prevent objects from being GC'ed, so the branches of the internal tuple tree only stay in-memory as long as the objects they contain are in use.
+
+## Limitations
+
+* Registered `Symbol`s cannot be used in `Tuples`. (i.e. created with `Symbol.for()`; [more info](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol#shared_symbols_in_the_global_symbol_registry)) [⚠️ Node v19 & Earlier](https://github.com/nodejs/node/issues/49135)
+
+## Schema
+
+A `Schema` allows you to define a complex structure for your immutables. It is defined by one or more `SchemaMapper` functions, which take a value and will either return it, or throw an error:
 
 ```javascript
 import { Schema as s } from 'libtuple';
 
-const boolSchema = s.boolean();
+const boolSchema = s.boolean(); // returns the boolean SchemaMapper
 
 boolSchema(true);  // returns true
 boolSchema(false); // returns false
@@ -202,41 +240,65 @@ s.parse(boolSchema, true);  // returns true
 s.parse(boolSchema, false); // returns false
 s.parse(boolSchema, 123);   // returns NaN
 ```
+
 ### SchemaMappers
 
-*Expand the sections below to see SchemaMapper documentation.*
+#### SchemaMappers for Values
 
-<details>
-  <summary>Schema Mappers for Values</summary>
+##### Schema.value(options)
 
-#### Schema.value(options)
+Validate an arbitrary value.
 
 * options.map - Callback to transform the value after its been validated.
 * options.check - Throw a TypeError if this returns false.
+* options.nullable - Is this value nullable?
+* options.optional - Is this value optional?
+* options.default - If the value is optional & undefined or missing, use this value.
 
-#### Schema.drop()
+##### Schema.literal(options)
 
-Drop the value (always maps to `undefined`)
+Validate a literal value. Must be strictly equal.
 
-#### Schema.boolean(options)
+* options.value - The value to check.
+
+##### Schema.overwrite(options)
+
+Overwrite a value.
+
+* options.value - The value to return.
+* options.map - Callback to transform the value.
+
+##### Schema.drop()
+
+Drop the value (always maps to `undefined`).
+
+##### Schema.boolean(options)
+
+Validate a boolean.
 
 * options.map - Callback to transform the value after its been validated.
 
-#### Schema.number(options)
+##### Schema.number(options)
 
 * options.min - Min value
 * options.max - Max value
 * options.map - Callback to transform the value after its been validated.
 * options.check - Throw a TypeError if this returns false.
+* options.nullable - Is this value nullable?
+* options.optional - Is this value optional?
+* options.default - If the value is optional & undefined or missing, use this value.
 
-#### Schema.bigint(options)
+##### Schema.bigint(options)
 
 * options.min - Min value
 * options.max - Max value
 * options.map - Callback to transform the value after its been validated.
 * options.check - Throw a TypeError if this returns false.
+* options.nullable - Is this value nullable?
+* options.optional - Is this value optional?
+* options.default - If the value is optional & undefined or missing, use this value.
 
-#### Schema.string(options)
+##### Schema.string(options)
 
 * options.min - Min length
 * options.max - Max length
@@ -244,47 +306,60 @@ Drop the value (always maps to `undefined`)
 * options.match - Throw a TypeError if this does NOT match
 * options.noMatch - Throw a TypeError if this DOES match
 * options.check - Throw a TypeError if this returns false.
+* options.nullable - Is this value nullable?
+* options.optional - Is this value optional?
+* options.default - If the value is optional & undefined or missing, use this value.
 
-#### Schema.array(options)
+##### Schema.array(options)
 
 * options.min - Min length
 * options.max - Max length
 * options.map - Callback to transform the value after its been validated.
 * options.each - Callback to transform each element.
 * options.check - Throw a TypeError if this returns false.
+* options.nullable - Is this value nullable?
+* options.optional - Is this value optional?
+* options.default - If the value is optional & undefined or missing, use this value.
 
-#### Schema.object(options)
+##### Schema.object(options)
 
 * options.class - Throw a TypeError if the class does not match.
 * options.map - Callback to transform the value after its been validated.
 * options.each - Callback to transform each element.
 * options.check - Throw a TypeError if this returns false.
+* options.nullable - Is this value nullable?
+* options.optional - Is this value optional?
+* options.default - If the value is optional & undefined or missing, use this value.
 
-#### Schema.function(options)
-
-* options.map - Callback to transform the value after its been validated.
-* options.check - Throw a TypeError if this returns false.
-
-#### Schema.symbol(options)
+##### Schema.function(options)
 
 * options.map - Callback to transform the value after its been validated.
 * options.check - Throw a TypeError if this returns false.
+* options.nullable - Is this value nullable?
+* options.optional - Is this value optional?
+* options.default - If the value is optional & undefined or missing, use this value.
 
-#### Schema.null(options)
+##### Schema.symbol(options)
+
+* options.map - Callback to transform the value after its been validated.
+* options.check - Throw a TypeError if this returns false.
+* options.nullable - Is this value nullable?
+* options.optional - Is this value optional?
+* options.default - If the value is optional & undefined or missing, use this value.
+
+##### Schema.null(options)
 
 * options.map - Callback to transform the value after its been validated.
 
-#### Schema.undefined(options)
+##### Schema.undefined(options)
 
 * options.map - Callback to transform the value after its been validated.
 
 ---
-</details>
 
-<details>
-  <summary>Schema Mappers for Convenience</summary>
+#### Schema Mappers for Convenience
 
-#### Convenience methods for numbers
+##### Convenience methods for numbers
 
 The following methods will call `s.number` with additional constraints added:
 
@@ -293,7 +368,7 @@ The following methods will call `s.number` with additional constraints added:
 * s.NaN
 * s.infinity
 
-#### Convenience methods for strings
+##### Convenience methods for strings
 
 The following methods will call `s.string` with additional constraints added:
 
@@ -327,39 +402,51 @@ The following methods will call `s.string` with additional constraints added:
     ```javascript
     const urlSchema = s.urlString();
 	urlSchema('https://example.com'); // 'https://example.com'
-    urlSchema('not a url'); // ERROR
+    urlSchema('not a url');           // ERROR
     ```
 * s.emailString
     ```javascript
     const emailSchema = s.emailString();
-	emailSchema('person@example.com'); // 'https://example.com'
-    emailSchema('not an email'); // ERROR
+	emailSchema('person@example.com'); // 'person@example.com'
+    emailSchema('not an email');       // ERROR
     ```
 * s.regexString
     ```javascript
     const regexSchema = s.regexString();
-	regexSchema('.+?'); // 'https://example.com'
+	regexSchema('.+?'); // '.+?'
     regexSchema('+++'); // ERROR
     ```
 * s.base64String
     ```javascript
     const base64Schema = s.base64String();
-    base64Schema('RXhhbXBsZSBzdHJpbmc='); // 'RXhhbXBsZSBzdHJpbmc=';
-    base64Schema('notbase64'); // ERROR;
+    base64Schema('RXhhbXBsZSBzdHJpbmc='); // 'RXhhbXBsZSBzdHJpbmc='
+    base64Schema('notbase64');            // ERROR;
     ```
 * s.jsonString
     ```javascript
     const jsonSchema = s.jsonString();
     jsonSchema('[0, 1, 2]'); // '[0, 1, 2]';
-    jsonSchema('not json'); // ERROR;
+    jsonSchema('not json');  // ERROR;
     ```
 
-</details>
+#### Special Schema Mappers
 
-<details>
-  <summary>Special Schema Mappers</summary>
+##### Schema.and(...schemaMappers)
 
-#### Schema.or(...schemaMappers)
+Run the value through each SchemaMapper in sequence.  Passes only if _all_ mappers succeed, returning the last mapped value.
+
+```javascript
+import { Schema as s } from 'libtuple';
+
+const schema = s.and(
+  s.string(),
+  s.oneOf(['foo', 'bar', 'baz'])
+);
+
+console.log(s.parse(schema, 'foo')); // 'foo'
+s.parse(schema, 'XYZ');              // NaN (fails to match oneOf clause)
+```
+##### Schema.or(...schemaMappers)
 
 Map the value with the first matching SchemaMapper
 
@@ -375,9 +462,24 @@ console.log( dateSchema('04 Apr 1995 00:12:00 GMT') );
 console.log( dateSchema(new Date) );
 ```
 
-#### Schema.repeat(r, schemaMapper)
+##### Schema.not(schemaMapper)
 
-Repeat a SchemaMapper r times
+Invert a SchemaMapper: succeeds only if the mapper throws, returning the original value.
+
+```javascript
+import { Schema as s } from 'libtuple';
+
+const schema = s.not(
+  s.string({match: /^foo/})
+);
+
+console.log(s.parse(schema, 'bar')); // 'bar'
+s.parse(schema, 'foobar');           // NaN (starts with 'foo')
+```
+
+##### Schema.repeat(r, schemaMapper)
+
+Repeat a SchemaMapper n times
 
 ```javascript
 import { Schema as s } from 'libtuple';
@@ -387,7 +489,7 @@ const pointSchema = s.tuple(...s.repeat(2, s.number()));
 const point = pointSchema([5, 10]);
 ```
 
-#### Schema.oneOf(literals = [], options = {})
+##### Schema.oneOf(literals = [], options = {})
 
 Match the value to a set of literals with strict-equals comparison.
 
@@ -401,38 +503,7 @@ s.parse(schema, 'something');   // 'something'
 s.parse(schema, 'not on list'); // ERROR!
 ```
 
-#### Schema.and(...schemaMappers)
-
-Run the value through each SchemaMapper in sequence.  Passes only if _all_ mappers succeed, returning the last mapped value.
-
-```javascript
-import { Schema as s } from 'libtuple';
-
-const schema = s.and(
-  s.string(),
-  s.matchRegex(/^[A-Z]+$/)
-);
-
-console.log(s.parse(schema, 'HELLO')); // 'HELLO'
-s.parse(schema, 'hello');            // NaN (lowercase fails)
-```
-
-#### Schema.not(schemaMapper)
-
-Invert a SchemaMapper: succeeds only if the mapper throws, returning the original value.
-
-```javascript
-import { Schema as s } from 'libtuple';
-
-const schema = s.not(
-  s.string({match: /^foo/})
-);
-
-console.log(s.parse(schema, 'bar'));   // 'bar'
-s.parse(schema, 'foobar');             // NaN (starts with 'foo')
-```
-
-#### Schema.asyncVal(schemaMapper)
+##### Schema.asyncVal(schemaMapper)
 
 Convert a SchemaMapper so it accepts a Promise as input and awaits it.
 
@@ -447,12 +518,10 @@ const schema = s.asyncVal(s.number());
 ```
 
 ---
-</details>
 
-<details>
-  <summary>Schema Mappers for Tuples, Groups, Records and Dicts</summary>
+#### Schema Mappers for Tuples, Groups, Records and Dicts
 
-#### Schema.tuple(...values)
+##### Schema.tuple(...values)
 
 Map one or more values to a Tuple.
 
@@ -464,11 +533,11 @@ const pointSchema = s.tuple(s.number(), s.number());
 const point = pointSchema([5, 10]);
 ```
 
-#### Schema.group(...values)
+##### Schema.group(...values)
 
 Map one or more values to a Group.
 
-#### Schema.record(properties)
+##### Schema.record(properties)
 
 Map one or more properties to a Record.
 
@@ -490,7 +559,7 @@ const company = companySchema({
 console.log({company});
 ```
 
-#### Schema.dict(properties)
+##### Schema.dict(properties)
 
 Map one or more values to a Dict.
 
@@ -512,7 +581,7 @@ const company = companySchema({
 console.log({company});
 ```
 
-#### Schema.nTuple(...values)
+##### Schema.nTuple(...values)
 
 Map n values to a Tuple. Will append each value in the input to the Tuple using the same mapper.
 
@@ -528,11 +597,11 @@ const vec4 = vectorSchema([5, 10, 11, 17]);
 console.log({vec2, vec3, vec4});
 ```
 
-#### Schema.nGroup(...values)
+##### Schema.nGroup(...values)
 
 Map n values to a Group. Will append each value in the input to the Group using the same mapper.
 
-#### Schema.nRecord(properties)
+##### Schema.nRecord(properties)
 
 Map an array of objects to a Tuple of Records.  If passed a single object, it is coerced into a one-element tuple.
 
@@ -556,7 +625,7 @@ console.log(users);
 // )
 ```
 
-#### Schema.nDict(properties)
+##### Schema.nDict(properties)
 
 Map an array of objects to a Tuple of Dicts.  If passed a single object, it is coerced into a one-element tuple.
 
@@ -580,7 +649,7 @@ console.log(configs);
 // )
 ```
 
-#### Schema.sTuple(...values)
+##### Schema.sTuple(...values)
 
 Strictly map values to a Tuple. Will throw an error if the number of values does not match.
 
@@ -593,11 +662,11 @@ const pointA = pointSchema([5, 10]);
 const pointB = pointSchema([5, 10, 1]); // ERROR!
 ```
 
-#### Schema.sGroup(...values)
+##### Schema.sGroup(...values)
 
 Strictly map values to a Group. Will throw an error if the number of values does not match.
 
-#### Schema.sRecord(properties)
+##### Schema.sRecord(properties)
 
 Strictly map values to a Record. Will throw an error if the number of values does not match.
 
@@ -626,11 +695,11 @@ companySchema({
 });
 ```
 
-#### Schema.sDict(properties)
+##### Schema.sDict(properties)
 
 Strictly map values to a Dict. Will throw an error if the number of values does not match.
 
-#### Schema.xTuple(...values)
+##### Schema.xTuple(...values)
 
 Exclusively map values to a Tuple. Will drop any keys not present in the schema.
 
@@ -648,11 +717,11 @@ console.log(pointB[2]); // undefined
 
 ```
 
-#### Schema.xGroup(...values)
+##### Schema.xGroup(...values)
 
 Exclusively map values to a Group. Will drop any keys not present in the schema.
 
-#### Schema.xRecord(properties)
+##### Schema.xRecord(properties)
 
 Exclusively map values to a Record. Will drop any keys not present in the schema.
 
@@ -674,50 +743,11 @@ const company = companySchema({
 console.log({company});
 ```
 
-#### Schema.xDict(properties)
+##### Schema.xDict(properties)
 
 Exclusively map values to a Dict. Will drop any keys not present in the schema.
 
 ---
-</details>
-
-## Gotchas
-
-In JavaScript, object comparisons are based on reference, not on the actual content of the objects. This means that even if two objects have the same properties and values, they are considered different if they do not reference the same memory location.
-
-For example, the following comparison returns false because each {} creates a new, unique object:
-
-```javascript
-Tuple( {} ) === Tuple( {} ); // FALSE!!!
-```
-
-Each {} is a different object in memory, so the tuples containing them are not strictly equal. This is an important behavior to understand when working with tuples that contain objects.
-
-To get the same tuple, you need to use the exact same object reference:
-
-```javascript
-const a = {};
-
-Tuple( a ) === Tuple( a ); // true :)
-```
-
-## How It Works
-
-A *tuple* is a type represented by a sequence of values. Unlike arrays, where `[1, 2] !== [1, 2]` (as they hold different object references), tuples provide a mechanism where `Tuple(1, 2) === Tuple(1, 2)`. This ensures that tuples with the same values are always strictly equal, simplifying equality checks and enhancing memory efficiency.
-
-For a sequence of primitives, this is trivial. Simply run `JSON.stringify` on the list of values and you've got a unique scalar that you can compare against others, and the object-reference problem is gone. Once you add objects to the mix, however, things can get complicated.
-
-Stringifying objects won't work, since given almost any stringification mechanism, two completely disparate objects can be coerced to resolve the same value. That only leaves us with bean-counting. If we keep track of which objects and scalars we've seen, we can use the unique value of the object reference itself to construct a path through a tree of `Maps` where the leaves are the ultimate scalar value of the tuple. But in that case we'll use memory to hold objects and scalars in memory long after their tuples are useful. It seems we're backed into a corner here.
-
-We could use trees of `WeakMaps` instead, however this case would only allow us to use objects, since scalars cannot be used as keys to a `WeakMap`. We'd end up with two disparate mechanisms, one for lists of only scalars, and one for lists of only objects. We just can't win here!
-
-And that's where prefix-trees come in. Before constructing a tree of `WeakMaps`, the function will group all neighboring scalars into singular values. This will then leave us with a list of objects interspersed by singular scalars. Each scalar is then considered the prefix of the next object. When constructing or traversing the tree, first we come upon a node representing the object, then its prefix, then the next object in the chain. If the first (or any) object has no scalar prefix, we simply move directly to the next object. If the list ends in a scalar, simply add a terminator object reference as a key to the leaf, which holds the actual tuple object.
-
-Organizing the hierarchy with the scalar prefixes *after* the objects allows us to exploit the `WeakMap`'s garbage collection behavior. Once the object keys are GC'ed, so are the entries of the `WeakMap`. Holding a key here does not prevent objects from being GC'ed, so the branches of the internal tuple tree only stay in-memory as long as the objects they contain are in use.
-
-## Limitations
-
-* Registered `Symbol`s cannot be used in `Tuples`. (i.e. created with `Symbol.for()`; [more info](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol#shared_symbols_in_the_global_symbol_registry)) [⚠️ Node v19 & Earlier](https://github.com/nodejs/node/issues/49135)
 
 ## Testing
 

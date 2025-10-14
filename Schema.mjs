@@ -1097,12 +1097,28 @@ const Schema = {
 	},
 
 	/**
-	 * Overwrite the provided value
+	 * Validate a literal value.
 	 * @param {Object} options
-	 * @param {*} options.value The literal value to return.
-	 * @param {function(any):any} options.map Transform the value.
+	 * @param {*} options.value The literal value to check.
 	 */
 	literal(options = {})
+	{
+		return (value, path) => {
+			if(value !== options.value)
+			{
+				throw new TypeError(`Expected oneOf ${options.value}, got ${value} at ${path || 'root'}`);
+			}
+			return options.value;
+		};
+	},
+
+	/**
+	 * Overwrite the provided value.
+	 * @param {Object} options
+	 * @param {*} options.value The value to return.
+	 * @param {function(any):any} options.map Transform the value.
+	 */
+	overwrite(options = {})
 	{
 		return (value, path) => options.map ? options.map(options.value) : options.value;
 	},

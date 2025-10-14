@@ -558,7 +558,13 @@ test('s.undefined test', t => {
 });
 
 test('s.literal test', t => {
-	const schema = s.literal({value: 321});
+	const schema = s.literal({value: 123});
+	assert.strictEqual(s.parse(schema, 123), 123);
+	assert.throws(() => schema(321));
+});
+
+test('s.overwrite test', t => {
+	const schema = s.overwrite({value: 321});
 	assert.strictEqual(s.parse(schema, 123), 321);
 	assert.strictEqual(s.parse(schema, 'some value'), 321);
 });
