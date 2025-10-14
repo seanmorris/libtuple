@@ -2,7 +2,7 @@
 
 *Memory-efficient immutables in 13.5kB*
 
-[![php-wasm](https://img.shields.io/npm/v/libtuple?color=7f3d65&label=libtuple&style=for-the-badge)](https://www.npmjs.com/package/libtuple)  [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/seanmorris/libtuple/test.yaml?style=for-the-badge&link=https%3A%2F%2Fgithub.com%2Fseanmorris%2Flibtuple)](https://github.com/seanmorris/libtuple/actions/workflows/test.yaml)  [![Apache-2.0 Licence Badge](https://img.shields.io/npm/l/libtuple?logo=apache&color=427819&style=for-the-badge)](https://github.com/seanmorris/libtuple/blob/master/LICENSE)
+[![npm version](https://img.shields.io/npm/v/libtuple?color=7f3d65&label=libtuple&style=for-the-badge)](https://www.npmjs.com/package/libtuple)  [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/seanmorris/libtuple/test.yaml?style=for-the-badge&link=https%3A%2F%2Fgithub.com%2Fseanmorris%2Flibtuple)](https://github.com/seanmorris/libtuple/actions/workflows/test.yaml)  [![License](https://img.shields.io/npm/l/libtuple?logo=apache&color=427819&style=for-the-badge)](https://github.com/seanmorris/libtuple/blob/master/LICENSE)
 
 ### ⚠️ Notice: Schemas have been moved to the [libtuple-schema](https://github.com/seanmorris/libtuple-schema) project. ⚠️
 
@@ -109,10 +109,10 @@ Simply import the functions from `libtuple`:
 import { Tuple, Group, Record, Dict } from 'libtuple';
 ```
 
-You can also import them via URL imports, or [dynamic imports](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import): *(npm not required)*
+You can also import them via URL imports, or [dynamic imports](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import) *(npm not required)*
 
 ```javascript
-import { Tuple, Group, Record, Dict } from 'https://cdn.jsdelivr.net/npm/libtuple@0.0.7-alpha-4/index.mjs';
+import { Tuple, Group, Record, Dict } from 'https://cdn.jsdelivr.net/npm/libtuple@1.0.0/index.mjs';
 ```
 
 ```javascript
@@ -208,9 +208,9 @@ Organizing the hierarchy with the scalar prefixes *after* the objects allows us 
 
 ## Testing
 
-Run `npm run test` or `node --test test.mjs` in the terminal.
+Run `npm run test` or `node --test --expose-gc test/test.mjs` in the terminal.
 
-# 🍻 Licensed under the Apache License, Version 2.0
+## 🍻 Licensed under the Apache License, Version 2.0
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
