@@ -18,6 +18,17 @@ $ npm install libtuple
 
 *(Groups, Records, and Dicts are just specialized Tuples)*
 
+### Value Objects
+
+A tuple with the same values is the same tuple:
+
+```javascript
+const t1 = Tuple('a', 'b', 'c');
+const t2 = Tuple('a', 'b', 'c');
+
+console.log( t1 === t2 ); //true
+```
+
 ### Immutable
 
 Tuples are immutable. Any attempt to modify them will not throw an error, but will silently fail, leaving the original values unchanged.
@@ -371,7 +382,7 @@ Repeat a SchemaMapper r times
 ```javascript
 import { Schema as s } from 'libtuple';
 
-const pointSchema = s.tuple(s.repeat(2, s.number()));
+const pointSchema = s.tuple(...s.repeat(2, s.number()));
 
 const point = pointSchema([5, 10]);
 ```
@@ -388,6 +399,51 @@ const schema = s.oneOf(['something', 1234]);
 s.parse(schema, 1234);          // 1234
 s.parse(schema, 'something');   // 'something'
 s.parse(schema, 'not on list'); // ERROR!
+```
+
+#### Schema.and(...schemaMappers)
+
+Run the value through each SchemaMapper in sequence.  Passes only if _all_ mappers succeed, returning the last mapped value.
+
+```javascript
+import { Schema as s } from 'libtuple';
+
+const schema = s.and(
+  s.string(),
+  s.matchRegex(/^[A-Z]+$/)
+);
+
+console.log(s.parse(schema, 'HELLO')); // 'HELLO'
+s.parse(schema, 'hello');            // NaN (lowercase fails)
+```
+
+#### Schema.not(schemaMapper)
+
+Invert a SchemaMapper: succeeds only if the mapper throws, returning the original value.
+
+```javascript
+import { Schema as s } from 'libtuple';
+
+const schema = s.not(
+  s.string({match: /^foo/})
+);
+
+console.log(s.parse(schema, 'bar'));   // 'bar'
+s.parse(schema, 'foobar');             // NaN (starts with 'foo')
+```
+
+#### Schema.asyncVal(schemaMapper)
+
+Convert a SchemaMapper so it accepts a Promise as input and awaits it.
+
+```javascript
+import { Schema as s } from 'libtuple';
+
+const schema = s.asyncVal(s.number());
+
+(async () => {
+  console.log(await schema(Promise.resolve(123))); // 123
+})();
 ```
 
 ---
@@ -478,29 +534,51 @@ Map n values to a Group. Will append each value in the input to the Group using 
 
 #### Schema.nRecord(properties)
 
-Map n properties to a Record. Will append additional properties without mapping or validation, if present.
+Map an array of objects to a Tuple of Records.  If passed a single object, it is coerced into a one-element tuple.
 
 ```javascript
 import { Schema as s } from 'libtuple';
 
-const companySchema = s.nRecord({
-    name: s.string(),
-    phone: s.string(),
-    address: s.string(),
+const usersSchema = s.nRecord({
+  id:   s.number(),
+  name: s.string(),
 });
 
-const company = companySchema({
-    name: 'Acme Corporation',
-    phone: '+1-000-555-1234',
-    address: '123 Fake St, Anytown, USA',
-    openHours: '9AM-7PM',
-    slogan: 'We do business.',
-});
+const users = usersSchema([
+  { id: 1, name: 'Alice', extra: 1234 },
+  { id: 2, name: 'Bob' }
+]);
+
+console.log(users);
+// Tuple(
+//   Record({id:1, name:'Alice', extra: 1234}),
+//   Record({id:2, name:'Bob'})
+// )
 ```
 
 #### Schema.nDict(properties)
 
-Map n properties to a Dict. Will append additional properties without mapping or validation, if present.
+Map an array of objects to a Tuple of Dicts.  If passed a single object, it is coerced into a one-element tuple.
+
+```javascript
+import { Schema as s } from 'libtuple';
+
+const configsSchema = s.nDict({
+  mode: s.string(),
+  flag: s.boolean(),
+});
+
+const configs = configsSchema([
+  { mode: 'dev', flag: true, extra: 'ignored' },
+  { mode: 'prod', flag: false }
+]);
+
+console.log(configs);
+// Tuple(
+//   Dict({mode:'dev', flag:true, extra:'ignored'}),
+//   Dict({mode:'prod', flag:false})
+// )
+```
 
 #### Schema.sTuple(...values)
 

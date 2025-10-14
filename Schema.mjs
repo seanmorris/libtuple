@@ -44,12 +44,12 @@ const Schema = {
 	record(schema = {})
 	{
 		return (arg, path = '') => {
-			const entries = Object.entries(schema);
+			const schemaEntries = Object.entries(schema);
 			return Record(Object.assign(
 				{},
 				arg,
 				Object.fromEntries(
-					entries.map(([key, schema]) => [key, schema(arg[key], `${path || 'root'}[${key}]`)])
+					schemaEntries.map(([key, schema]) => [key, schema(arg[key], `${path || 'root'}[${key}]`)])
 				)
 			));
 		}
@@ -62,71 +62,6 @@ const Schema = {
 	 */
 	dict(schema = {})
 	{
-		return (arg, path = '') => {
-			const entries = Object.entries(arg);
-			return Dict(Object.fromEntries(
-				entries.map(([key, value]) => [key, schema[key] ? schema[key](value, `${path || 'root'}[${key}]`) : value])
-			));
-		}
-	},
-
-	/**
-	 * Map n values to a Tuple.
-	 * Will append each value in the input to the Tuple using the same mapper.
-	 * @param {SchemaMapper} schema - A SchemaMapper
-	 */
-	nTuple(schema)
-	{
-		return (args, path) => {
-			if(!Array.isArray(args))
-			{
-				args = [args]
-			}
-
-			return Tuple(...args.map((arg, index) => schema ? schema(arg, `${path || 'root'}[${index}]`) : arg));
-		}
-	},
-
-	/**
-	 * Map n values to a Group.
-	 * Will append each value in the input to the Group using the same mapper.
-	 * @param {SchemaMapper} schema - A list of SchemaMappers
-	 */
-	nGroup(schema)
-	{
-		return (args, path = '') => {
-			if(!Array.isArray(args))
-			{
-				args = [args]
-			}
-
-			return Group(...args.map((arg, index) => schema ? schema(arg, `${path || 'root'}[${index}]`) : arg));
-		}
-	},
-
-	/**
-	 * Map n keys to a Record.
-	 * @param {Object.<string, SchemaMapper>} schema - An Object holding SchemaMappers
-	 */
-	nRecord(schema)
-	{
-		return (arg, path = '') => {
-			const entries = Object.entries(arg);
-			return Record(Object.fromEntries(
-				entries.map(([key, value]) => [key, schema[key] ? schema[key](value, `${path || 'root'}[${key}]`) : value])
-			));
-		}
-	},
-
-	/**
-	 * Map n keys to a Dict.
-	 * @param {Object.<string, SchemaMapper>} schema - An Object holding SchemaMappers
-	 */
-	nDict(schema)
-	{
-		/**
-		 * @type SchemaMapper
-		 */
 		return (arg, path = '') => {
 			const entries = Object.entries(arg);
 			return Dict(Object.fromEntries(
@@ -179,8 +114,8 @@ const Schema = {
 	sRecord(schema = {})
 	{
 		return (arg, path = '') => {
-			const entries = Object.entries(arg);
 			const schemaLength = Object.keys(schema).length;
+			const entries = Object.entries(arg);
 			if(schemaLength > entries.length)
 			{
 				throw new TypeError(`Expected ${schemaLength} elements, got ${entries.length} elements at ${path || 'root'}.`);
@@ -290,13 +225,111 @@ const Schema = {
 	},
 
 	/**
+	 * Map n values to a Tuple.
+	 * Will append each value in the input to the Tuple using the same mapper.
+	 * @param {SchemaMapper} schema - A SchemaMapper
+	 */
+	nTuple(schema)
+	{
+		return (args, path) => {
+			if(!Array.isArray(args))
+			{
+				args = [args]
+			}
+
+			return Tuple(...args.map((arg, index) => schema ? schema(arg, `${path || 'root'}[${index}]`) : arg));
+		}
+	},
+
+	/**
+	 * Map n values to a Group.
+	 * Will append each value in the input to the Group using the same mapper.
+	 * @param {SchemaMapper} schema - A list of SchemaMappers
+	 */
+	nGroup(schema)
+	{
+		return (args, path = '') => {
+			if(!Array.isArray(args))
+			{
+				args = [args]
+			}
+
+			return Group(...args.map((arg, index) => schema ? schema(arg, `${path || 'root'}[${index}]`) : arg));
+		}
+	},
+
+	/**
+	 * Map n keys to a Record.
+	 * @param {Object.<string, SchemaMapper>} schema - An Object holding SchemaMappers
+	 */
+	nRecord(schema = {})
+	{
+		return (args, path = '') => {
+			if(!Array.isArray(args))
+			{
+				args = [args]
+			}
+			return Tuple(...args.map(arg => {
+				const entries = Object.entries(arg);
+				return Record(Object.fromEntries(
+					entries.map(([key, value]) => [key, schema[key] ? schema[key](value, `${path || 'root'}[${key}]`) : value])
+				));
+			}));
+		}
+	},
+
+	/**
+	 * Map n keys to a Dict.
+	 * @param {Object.<string, SchemaMapper>} schema - An Object holding SchemaMappers
+	 */
+	nDict(schema = {})
+	{
+		/**
+		 * @type SchemaMapper
+		 */
+		return (args, path = '') => {
+			if(!Array.isArray(args))
+			{
+				args = [args]
+			}
+			return Tuple(...args.map(arg => {
+				const entries = Object.entries(arg);
+				return Dict(Object.fromEntries(
+					entries.map(([key, value]) => [key, schema[key] ? schema[key](value, `${path || 'root'}[${key}]`) : value])
+				));
+			}));
+		}
+	},
+
+	// @todo: nsTuple
+	// @todo: nsGroup
+	// @todo: nsRecord
+	// @todo: nsDict
+
+	// @todo: nxTuple
+	// @todo: nxGroup
+	// @todo: nxRecord
+	// @todo: nxDict
+
+	/**
 	 * Validate a boolean
 	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {function(any):any} options.map Transform the value after its been validated.
 	 */
 	boolean(options = {})
 	{
 		return (value, path = '') => {
+			if(options.optional && value === undefined)
+			{
+				return options.default;
+			}
+			if(options.nullable && value === null)
+			{
+				return null;
+			}
 			if(typeof value !== 'boolean')
 			{
 				throw new TypeError(`Expected boolean, got ${typeof value} at ${path || 'root'}`);
@@ -312,6 +345,9 @@ const Schema = {
 	/**
 	 * Validate a number
 	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {number} options.max Max value
 	 * @param {number} options.min Min value
 	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
@@ -320,6 +356,14 @@ const Schema = {
 	number(options = {})
 	{
 		return (value, path = '') => {
+			if(options.optional && value === undefined)
+			{
+				return options.default;
+			}
+			if(options.nullable && value === null)
+			{
+				return null;
+			}
 			if(typeof value !== 'number')
 			{
 				throw new TypeError(`Expected number, got ${typeof value} at ${path || 'root'}`);
@@ -347,6 +391,9 @@ const Schema = {
 	/**
 	 * Validate an integer
 	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {number} options.max Max value
 	 * @param {number} options.min Min value
 	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
@@ -371,6 +418,9 @@ const Schema = {
 	/**
 	 * Validate a float
 	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {number} options.max Max value
 	 * @param {number} options.min Min value
 	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
@@ -395,6 +445,9 @@ const Schema = {
 	/**
 	 * Validate a NaN
 	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
 	 * @param {function(any):any} options.map Transform the value after its been validated.
 	 */
@@ -417,6 +470,9 @@ const Schema = {
 	/**
 	 * Validate an infinite value
 	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {number} options.max Max value
 	 * @param {number} options.min Min value
 	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
@@ -439,6 +495,9 @@ const Schema = {
 	/**
 	 * Validate a bigint
 	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {number} options.max Max value
 	 * @param {number} options.min Min value
 	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
@@ -447,6 +506,14 @@ const Schema = {
 	bigint(options = {})
 	{
 		return (value, path = '') => {
+			if(options.optional && value === undefined)
+			{
+				return options.default;
+			}
+			if(options.nullable && value === null)
+			{
+				return null;
+			}
 			if(typeof value !== 'bigint')
 			{
 				throw new TypeError(`Expected bigint, got ${typeof value} at ${path || 'root'}`);
@@ -474,6 +541,9 @@ const Schema = {
 	/**
 	 * Validate a string
 	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {number} options.max Max length
 	 * @param {number} options.min Min length
 	 * @param {Regex} options.match Throw a TypeError if this does NOT match
@@ -484,6 +554,14 @@ const Schema = {
 	string(options = {})
 	{
 		return (value, path = '') => {
+			if(options.optional && value === undefined)
+			{
+				return options.default;
+			}
+			if(options.nullable && value === null)
+			{
+				return null;
+			}
 			if(typeof value !== 'string')
 			{
 				throw new TypeError(`Expected string, got ${typeof value} at ${path || 'root'}`);
@@ -516,7 +594,7 @@ const Schema = {
 			{
 				throw new TypeError(`Expected string to match ${options.match}, got "${value}" at ${path || 'root'}`);
 			}
-			if(options.noMatch && value.noMatch(options.noMatch))
+			if(options.noMatch && value.match(options.noMatch))
 			{
 				throw new TypeError(`Expected string NOT to match ${options.noMatch}, got "${value}" at ${path || 'root'}`);
 			}
@@ -531,6 +609,9 @@ const Schema = {
 	/**
 	 * Validate a numeric string
 	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {number} options.max Max value
 	 * @param {number} options.min Min value
 	 * @param {Regex} options.match Throw a TypeError if this does NOT match
@@ -541,6 +622,14 @@ const Schema = {
 	numericString(options = {})
 	{
 		return (value, path = '') => {
+			if(options.optional && value === undefined)
+			{
+				return options.default;
+			}
+			if(options.nullable && value === null)
+			{
+				return null;
+			}
 			if(isNaN(value) || value === null || value != Number(value))
 			{
 				throw new TypeError(`Expected numeric, got "${value}" at ${path || 'root'}`);
@@ -563,6 +652,9 @@ const Schema = {
 	/**
 	 * Validate a date string
 	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {number} options.max Max length
 	 * @param {number} options.min Min length
 	 * @param {Regex} options.match Throw a TypeError if this does NOT match
@@ -573,6 +665,14 @@ const Schema = {
 	dateString(options = {})
 	{
 		return (value, path = '') => {
+			if(options.optional && value === undefined)
+			{
+				return options.default;
+			}
+			if(options.nullable && value === null)
+			{
+				return null;
+			}
 			if(isNaN(Date.parse(value)))
 			{
 				throw new TypeError(`Expected dateString, got "${value}" at ${path || 'root'}`);
@@ -592,6 +692,13 @@ const Schema = {
 		};
 	},
 
+	/**
+	 * Validate a uuid string
+	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
+	 */
 	uuidString(options = {})
 	{
 		const checks = [ value => String(value).match(/^[a-z,0-9]{8}-[a-z,0-9]{4}-[a-z,0-9]{4}-[a-z,0-9]{4}-[a-z,0-9]{12}$/i) ];
@@ -609,6 +716,9 @@ const Schema = {
 	/**
 	 * Validate a url string
 	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {number} options.max Max length
 	 * @param {number} options.min Min length
 	 * @param {Regex} options.match Throw a TypeError if this does NOT match
@@ -633,6 +743,9 @@ const Schema = {
 	/**
 	 * Validate a regex string
 	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {number} options.max Max length
 	 * @param {number} options.min Min length
 	 * @param {Regex} options.match Throw a TypeError if this does NOT match
@@ -677,6 +790,9 @@ const Schema = {
 	/**
 	 * Validate a base64 string
 	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {number} options.max Max length
 	 * @param {number} options.min Min length
 	 * @param {Regex} options.match Throw a TypeError if this does NOT match
@@ -701,6 +817,9 @@ const Schema = {
 	/**
 	 * Validate a JSON string
 	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {number} options.max Max length
 	 * @param {number} options.min Min length
 	 * @param {Regex} options.match Throw a TypeError if this does NOT match
@@ -725,6 +844,9 @@ const Schema = {
 	/**
 	 * Validate an array
 	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {number} options.max Max length
 	 * @param {number} options.min Min length
 	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
@@ -734,6 +856,14 @@ const Schema = {
 	array(options = {})
 	{
 		return (value, path = '') => {
+			if(options.optional && value === undefined)
+			{
+				return options.default;
+			}
+			if(options.nullable && value === null)
+			{
+				return null;
+			}
 			if(!Array.isArray(value))
 			{
 				throw new TypeError(`Expected Array, got ${typeof value} at ${path || 'root'}`);
@@ -765,6 +895,10 @@ const Schema = {
 	/**
 	 * Validate an object
 	 * @param {Object} options
+	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
 	 * @param {function(any):class} options.class Throw a TypeError if the class does not match.
 	 * @param {function(any):any} options.map Transform the object after its been validated.
@@ -773,6 +907,14 @@ const Schema = {
 	object(options = {})
 	{
 		return (value, path = '') => {
+			if(options.optional && value === undefined)
+			{
+				return options.default;
+			}
+			if(options.nullable && value === null)
+			{
+				return null;
+			}
 			if(typeof value !== 'object')
 			{
 				throw new TypeError(`Expected object, got ${typeof value} at ${path || 'root'}`);
@@ -800,6 +942,14 @@ const Schema = {
 	date(options = {})
 	{
 		return (value, path = '') => {
+			if(options.optional && value === undefined)
+			{
+				return options.default;
+			}
+			if(options.nullable && value === null)
+			{
+				return null;
+			}
 			if(!(value instanceof Date))
 			{
 				throw new TypeError(`Expected Date, got "${value}" at ${path || 'root'}`);
@@ -820,12 +970,23 @@ const Schema = {
 	/**
 	 * Validate a function
 	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
 	 * @param {function(any):any} options.map Transform the value after its been validated.
 	 */
 	function(options = {})
 	{
 		return (value, path = '') => {
+			if(options.optional && value === undefined)
+			{
+				return options.default;
+			}
+			if(options.nullable && value === null)
+			{
+				return null;
+			}
 			if(typeof value !== 'function')
 			{
 				throw new TypeError(`Expected function, got ${typeof value} at ${path || 'root'}`);
@@ -845,12 +1006,23 @@ const Schema = {
 	/**
 	 * Validate a symbol
 	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {function(any):boolean} options.check Throw a TypeError if this returns false.
 	 * @param {function(any):any} options.map Transform the value after its been validated.
 	 */
 	symbol(options = {})
 	{
 		return (value, path = '') => {
+			if(options.optional && value === undefined)
+			{
+				return options.default;
+			}
+			if(options.nullable && value === null)
+			{
+				return null;
+			}
 			if(typeof value !== 'symbol')
 			{
 				throw new TypeError(`Expected symbol, got ${typeof value} at ${path || 'root'}`);
@@ -870,11 +1042,17 @@ const Schema = {
 	/**
 	 * Validate a null
 	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
 	 * @param {function(any):any} options.map Transform the value after its been validated.
 	 */
 	null(options = {})
 	{
 		return (value, path = '') => {
+			if(options.optional && value === undefined)
+			{
+				return options.default;
+			}
 			if(value !== null)
 			{
 				throw new TypeError(`Expected null, got ${typeof value} at ${path || 'root'}`);
@@ -890,11 +1068,22 @@ const Schema = {
 	/**
 	 * Validate an undefined
 	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {function(any):any} options.map Transform the value after its been validated.
 	 */
 	undefined(options = {})
 	{
 		return (value, path = '') => {
+			if(options.optional && value === undefined)
+			{
+				return options.default;
+			}
+			if(options.nullable && value === null)
+			{
+				return null;
+			}
 			if(value !== undefined)
 			{
 				throw new TypeError(`Expected undefined, got ${typeof value} at ${path || 'root'}`);
@@ -908,13 +1097,35 @@ const Schema = {
 	},
 
 	/**
-	 * Return the value
+	 * Overwrite the provided value
 	 * @param {Object} options
+	 * @param {*} options.value The literal value to return.
+	 * @param {function(any):any} options.map Transform the value.
+	 */
+	literal(options = {})
+	{
+		return (value, path) => options.map ? options.map(options.value) : options.value;
+	},
+
+	/**
+	 * Return the provided value
+	 * @param {Object} options
+	 * @param {boolean} options.optional Is this an optional value?
+	 * @param {*} options.default If the value is optional & undefined or missing, use this value.
+	 * @param {boolean} options.nullable Is this a nullable value?
 	 * @param {function(any):any} options.map Transform the value.
 	 */
 	value(options = {})
 	{
 		return (value, path = '') => {
+			if(options.optional && value === undefined)
+			{
+				return options.default;
+			}
+			if(options.nullable && value === null)
+			{
+				return null;
+			}
 			if(options.map)
 			{
 				value = options.map(value);
@@ -934,7 +1145,7 @@ const Schema = {
 		return (value, path = '') => {
 			if(!literals.includes(value))
 			{
-				throw new TypeError(`Expected oneOf ${values.join(', ')}, got ${value} at ${path || 'root'}`);
+				throw new TypeError(`Expected oneOf ${literals.join(', ')}, got ${value} at ${path || 'root'}`);
 			}
 			if(options.map)
 			{
@@ -960,6 +1171,7 @@ const Schema = {
 	{
 		return (value, path) => {
 			const errors = [];
+
 			for(const mapper of mappers)
 			{
 				try
@@ -976,6 +1188,63 @@ const Schema = {
 			multi.errors = errors;
 			throw multi;
 		};
+	},
+
+	and(...mappers)
+	{
+		return (value, path) => {
+			const errors = [];
+
+			for(const mapper of mappers)
+			{
+				try
+				{
+					value = mapper(value, path);
+				}
+				catch(error)
+				{
+					errors.push(error);
+				}
+			}
+
+			if(errors.length === 0)
+			{
+				return value;
+			}
+
+			const multi = new Error(errors.map(e => e.message).join(', '));
+			multi.errors = errors;
+			throw multi;
+		};
+	},
+
+	/**
+	 * Invert the SchemaMapper.
+	 * @param {SchemaMapper} mapper The mapper to invert.
+	 */
+	not(mapper)
+	{
+		return (value, path) => {
+			try
+			{
+				mapper(value, path);
+			}
+			catch(error)
+			{
+				return value;
+			}
+
+			throw new TypeError(`Expected ${path || 'root'} to NOT match.`);
+		};
+	},
+
+	/**
+	 * Make the SchemaMapper asynchronous.
+	 * @param {SchemaMapper} mapper The mapper to invert.
+	 */
+	asyncVal(mapper)
+	{
+		return async (promise, path) => mapper(await promise, path);
 	},
 
 	/**
