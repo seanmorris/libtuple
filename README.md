@@ -314,7 +314,7 @@ The following methods will call `s.string` with additional constraints added:
     // options.min & options.max are overridden for comparison with Date objects.
     const after1994 = s.dateString({min: new Date('01/01/1995')});
 
-    after1994('07/04/1995'); // '01/01/1996'
+    after1994('07/04/1995'); // '07/04/1995'
     after1994('07/04/1989'); // ERROR
     ```
 * s.uuidString
