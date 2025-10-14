@@ -11,13 +11,15 @@ import { size } from '../Tuple.mjs';
 const tests  = [];
 
 tests.push(test('toString Tag Test', t => {
+	const tuple = Tuple();
 	const group = Group();
 	const record = Record();
-	const tuple = Tuple();
+	const dict = Dict();
 
+	assert.strictEqual(String(tuple),  '[object Tuple]');
 	assert.strictEqual(String(group),  '[object Group]');
 	assert.strictEqual(String(record), '[object Record]');
-	assert.strictEqual(String(tuple),  '[object Tuple]');
+	assert.strictEqual(String(dict),   '[object Dict]');
 }));
 
 tests.push(test('Null Tuple Test', t => {
@@ -678,6 +680,7 @@ const [major, minor, patch] = process.versions.node.split('.');
 tests.push(test('Symbol Tuple Test', {skip: major < 20 ? 'https://github.com/nodejs/node/issues/49135' : false}, t => {
 	const tuple = Tuple();
 	const symbol = Symbol();
+	const registered = Symbol.for('registered');
 	const object = {};
 	assert.strictEqual(Tuple( symbol ), Tuple( symbol ));
 	assert.strictEqual(Tuple( symbol, 'aaa' ), Tuple( symbol, 'aaa' ));
@@ -687,6 +690,7 @@ tests.push(test('Symbol Tuple Test', {skip: major < 20 ? 'https://github.com/nod
 	assert.notEqual(Tuple( 'aaa', symbol ), Tuple( symbol, 'aaa' ));
 	assert.notEqual(Tuple( symbol, object ), Tuple( object, symbol ));
 	assert.notEqual(Tuple( symbol, object ), Tuple( symbol, {} ));
+	assert.throws(() => Tuple( registered ), 'Cannot use registered symbols in a tuple.');
 }));
 
 tests.push(test('bigint Tuple Test', t => {
