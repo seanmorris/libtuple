@@ -33,7 +33,7 @@ const registry = new FinalizationRegistry(held => {
 	if(scalarMap.has(held) && scalarMap.get(held).deref() !== undefined)
 	{
 		// Preventing race condition #1 outlined here:
-		// https://github.com/seanmorris/libtuple/issues/2
+		// https://github.com/seanmorris/libtuple/issues/2 | https://archive.is/EEGHR
 		return;
 	}
 	scalarMap.delete(held);
